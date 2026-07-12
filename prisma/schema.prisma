@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ProfilDesa {
+  id         Int      @id @default(autoincrement())
+  namaDesa   String   @map("nama_desa") @db.VarChar(100)
+  kecamatan  String?  @db.VarChar(100)
+  kabupaten  String?  @db.VarChar(100)
+  provinsi   String?  @db.VarChar(100)
+  alamat     String?  @db.Text
+  kodePos    String?  @map("kode_pos") @db.VarChar(10)
+  email      String?  @db.VarChar(100)
+  telepon    String?  @db.VarChar(30)
+  whatsapp   String?  @db.VarChar(30)
+  deskripsi  String?  @db.Text
+  visi       String?  @db.Text
+  misi       String?  @db.Text
+  logo       String?  @db.VarChar(255)
+  fotoKantor String?  @map("foto_kantor") @db.VarChar(255)
+  mapsEmbed  String?  @map("maps_embed") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("profil_desa")
+}
+
+model VideoProfil {
+  id        Int          @id @default(autoincrement())
+  judul     String       @db.VarChar(150)
+  deskripsi String?      @db.Text
+  urlVideo  String       @map("url_video") @db.VarChar(255)
+  thumbnail String?      @db.VarChar(255)
+  status    StatusAktif? @default(aktif)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("video_profil")
+}
+
+model JamPelayanan {
+  id         Int       @id @default(autoincrement())
+  hari       String    @db.VarChar(100)
+  jamBuka    DateTime? @map("jam_buka") @db.Time(0)
+  jamTutup   DateTime? @map("jam_tutup") @db.Time(0)
+  keterangan String?   @db.VarChar(100)
+  urutan     Int?      @default(0)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("jam_pelayanan")
+}
+
+model Kegiatan {
+  id        Int              @id @default(autoincrement())
+  judul     String           @db.VarChar(200)
+  slug      String?          @unique(map: "slug") @db.VarChar(220)
+  tanggal   DateTime         @db.Date
+  lokasi    String?          @db.VarChar(150)
+  kategori  String?          @db.VarChar(100)
+  ringkasan String?          @db.Text
+  isi       String?          @db.LongText
+  gambar    String?          @db.VarChar(255)
+  status    StatusPublikasi? @default(draft)
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("kegiatan")
+}
+
+model LembagaDesa {
+  id          Int              @id @default(autoincrement())
+  namaLembaga String           @map("nama_lembaga") @db.VarChar(150)
+  singkatan   String?          @db.VarChar(50)
+  deskripsi   String?          @db.Text
+  ketua       String?          @db.VarChar(100)
+  periode     String?          @db.VarChar(50)
+  ikon        String?          @db.VarChar(255)
+  foto        String?          @db.VarChar(255)
+  status      StatusAktif?     @default(aktif)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  anggota     AnggotaLembaga[]
+
+  @@map("lembaga_desa")
+}
+
+model AnggotaLembaga {
+  id        Int         @id @default(autoincrement())
+  lembagaId Int         @map("lembaga_id")
+  nama      String      @db.VarChar(100)
+  jabatan   String?     @db.VarChar(100)
+  foto      String?     @db.VarChar(255)
+  urutan    Int?        @default(0)
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  lembaga   LembagaDesa @relation(fields: [lembagaId], references: [id], onDelete: Cascade, map: "fk_anggota_lembaga")
+
+  @@index([lembagaId], map: "fk_anggota_lembaga")
+  @@map("anggota_lembaga")
+}
+
+model ProdukHukum {
+  id                Int              @id @default(autoincrement())
+  jenis             JenisProdukHukum
+  nomor             String           @db.VarChar(100)
+  tahun             Int              @db.Year
+  judul             String           @db.VarChar(255)
+  tanggalDitetapkan DateTime?        @map("tanggal_ditetapkan") @db.Date
+  fileDokumen       String?          @map("file_dokumen") @db.VarChar(255)
+  keterangan        String?          @db.Text
+  status            StatusPublikasi? @default(publish)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("produk_hukum")
+}
+
+model LayananDesa {
+  id            Int          @id @default(autoincrement())
+  namaLayanan   String       @map("nama_layanan") @db.VarChar(150)
+  deskripsi     String?      @db.Text
+  persyaratan   String?      @db.Text
+  alurLayanan   String?      @map("alur_layanan") @db.Text
+  estimasiWaktu String?      @map("estimasi_waktu") @db.VarChar(100)
+  biaya         String?      @db.VarChar(100)
+  ikon          String?      @db.VarChar(255)
+  status        StatusAktif? @default(aktif)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("layanan_desa")
+}
+
+model KontakDesa {
+  id         Int         @id @default(autoincrement())
+  namaKontak String      @map("nama_kontak") @db.VarChar(100)
+  jabatan    String?     @db.VarChar(100)
+  telepon    String?     @db.VarChar(30)
+  email      String?     @db.VarChar(100)
+  alamat     String?     @db.Text
+  tipe       TipeKontak? @default(Kantor_Desa)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+
+  @@map("kontak_desa")
+}
+
+enum StatusAktif {
+  aktif
+  nonaktif
+}
+
+enum StatusPublikasi {
+  draft
+  publish
+}
+
+enum JenisProdukHukum {
+  Perdes
+  Perkades
+  SK_Kades      @map("SK Kades")
+  Keputusan_BPD @map("Keputusan BPD")
+  APBDes
+  RKPDes
+  Lainnya
+}
+
+enum TipeKontak {
+  Kantor_Desa    @map("Kantor Desa")
+  Perangkat_Desa @map("Perangkat Desa")
+  Layanan
+  Lainnya
+}
