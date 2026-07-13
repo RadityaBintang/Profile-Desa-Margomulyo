@@ -56,11 +56,3 @@ ADMIN_USERNAME=admin ADMIN_PASSWORD=passwordkuatanda npm run prisma:seed
 
 4. Login lewat `http://localhost:3000/login`, atau klik tombol **Login** di
    pojok kanan navbar.
-
-Setelah login, tombol "+ Tambah Kegiatan" dan "Edit Kegiatan" akan otomatis
-muncul, dan halaman `/kegiatan/tambah` serta `/kegiatan/[slug]/edit` hanya
-bisa diakses oleh admin yang sudah login (dijaga di level middleware, halaman,
-maupun Server Action).
-
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
