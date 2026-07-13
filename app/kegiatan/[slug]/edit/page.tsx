@@ -1,14 +1,8 @@
 import Link from "next/link";
-<<<<<<< HEAD
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { updatePublicKegiatan } from "../../actions";
 import { getAdminSession } from "@/lib/auth";
-=======
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { updatePublicKegiatan } from "../../actions";
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
 export default async function EditKegiatanPage({
   params,
@@ -17,15 +11,12 @@ export default async function EditKegiatanPage({
 }) {
   const { slug } = await params;
 
-<<<<<<< HEAD
   const session = await getAdminSession();
 
   if (!session) {
     redirect(`/login?redirectTo=/kegiatan/${slug}/edit`);
   }
 
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   const numericId = Number(slug);
 
   const kegiatan = await prisma.kegiatan.findFirst({

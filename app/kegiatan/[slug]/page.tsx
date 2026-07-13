@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-<<<<<<< HEAD
 import { getAdminSession } from "@/lib/auth";
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
 function formatTanggal(date: Date) {
   return new Date(date).toLocaleDateString("id-ID", {
@@ -99,16 +96,12 @@ export default async function DetailKegiatanPage({
   });
 
   const badge = getDateBadge(kegiatan.tanggal);
-<<<<<<< HEAD
   const session = await getAdminSession();
   const activitySlug = kegiatan.slug || String(kegiatan.id);
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
   return (
     <main className="detail-activity-page">
       <div className="container-desa">
-<<<<<<< HEAD
         <div className="detail-toolbar">
           <Link href="/kegiatan" className="detail-back-button">
             ← Kembali ke Kegiatan
@@ -123,11 +116,6 @@ export default async function DetailKegiatanPage({
             </Link>
           )}
         </div>
-=======
-        <Link href="/kegiatan" className="detail-back-button">
-          ← Kembali ke Kegiatan
-        </Link>
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
         <div className="detail-activity-layout">
           <article className="detail-activity-main">

@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-<<<<<<< HEAD
 model Admin {
   id        Int      @id @default(autoincrement())
   username  String   @unique(map: "username") @db.VarChar(50)
@@ -19,8 +18,6 @@ model Admin {
   @@map("admin")
 }
 
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 model ProfilDesa {
   id         Int      @id @default(autoincrement())
   namaDesa   String   @map("nama_desa") @db.VarChar(100)

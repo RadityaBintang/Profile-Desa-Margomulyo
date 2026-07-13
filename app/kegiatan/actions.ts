@@ -6,10 +6,7 @@ import { redirect } from "next/navigation";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
-<<<<<<< HEAD
 import { requireAdmin } from "@/lib/auth";
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
 function createSlug(text: string) {
   return text
@@ -51,11 +48,8 @@ async function saveImage(file: File | null) {
 }
 
 export async function createPublicKegiatan(formData: FormData) {
-<<<<<<< HEAD
   await requireAdmin();
 
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   const judul = String(formData.get("judul") || "");
   const tanggal = String(formData.get("tanggal") || "");
   const lokasi = String(formData.get("lokasi") || "");
@@ -91,11 +85,8 @@ export async function createPublicKegiatan(formData: FormData) {
 }
 
 export async function updatePublicKegiatan(id: number, formData: FormData) {
-<<<<<<< HEAD
   await requireAdmin();
 
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   const judul = String(formData.get("judul") || "");
   const tanggal = String(formData.get("tanggal") || "");
   const lokasi = String(formData.get("lokasi") || "");
@@ -136,11 +127,8 @@ export async function updatePublicKegiatan(id: number, formData: FormData) {
 }
 
 export async function deletePublicKegiatan(id: number) {
-<<<<<<< HEAD
   await requireAdmin();
 
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   await prisma.kegiatan.delete({
     where: {
       id,

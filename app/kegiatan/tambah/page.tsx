@@ -1,5 +1,4 @@
 import Link from "next/link";
-<<<<<<< HEAD
 import { redirect } from "next/navigation";
 import { createPublicKegiatan } from "../actions";
 import { getAdminSession } from "@/lib/auth";
@@ -11,11 +10,6 @@ export default async function TambahKegiatanPage() {
     redirect("/login?redirectTo=/kegiatan/tambah");
   }
 
-=======
-import { createPublicKegiatan } from "../actions";
-
-export default function TambahKegiatanPage() {
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   return (
     <main className="activity-form-page">
       <div className="container-desa">

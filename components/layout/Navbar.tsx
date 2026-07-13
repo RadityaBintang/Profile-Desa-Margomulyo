@@ -1,10 +1,7 @@
 import Link from "next/link";
-<<<<<<< HEAD
 import { LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { getAdminSession } from "@/lib/auth";
 import { logoutAdmin } from "@/app/actions/auth";
-=======
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
 const menus = [
   { label: "Beranda", href: "/" },
@@ -15,15 +12,11 @@ const menus = [
   { label: "Kontak", href: "/kontak" },
 ];
 
-<<<<<<< HEAD
 export async function Navbar() {
   // Navbar adalah Server Component async, jadi session admin bisa langsung
   // dibaca di sini tanpa perlu request tambahan di sisi client.
   const session = await getAdminSession();
 
-=======
-export function Navbar() {
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
       <nav className="container-desa flex items-center justify-between py-4">
@@ -34,7 +27,6 @@ export function Navbar() {
             <p className="text-xs text-slate-500">Kecamatan Ngemplak, Kabupaten Sleman</p>
           </div>
         </Link>
-<<<<<<< HEAD
 
         <div className="flex items-center gap-4">
           <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex">
@@ -69,14 +61,6 @@ export function Navbar() {
               </Link>
             )}
           </div>
-=======
-        <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex">
-          {menus.map((menu) => (
-            <Link key={menu.href} href={menu.href} className="transition hover:text-blue-600">
-              {menu.label}
-            </Link>
-          ))}
->>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
         </div>
       </nav>
     </header>
