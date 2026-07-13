@@ -31,6 +31,7 @@ npm run dev
 ```
 
 Buka `http://localhost:3000`.
+<<<<<<< HEAD
 
 ## Fitur Login Admin
 
@@ -61,3 +62,5 @@ muncul, dan halaman `/kegiatan/tambah` serta `/kegiatan/[slug]/edit` hanya
 bisa diakses oleh admin yang sudah login (dijaga di level middleware, halaman,
 maupun Server Action).
 
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c

@@ -9,6 +9,7 @@
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+<<<<<<< HEAD
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts"
   },
@@ -24,6 +25,16 @@
     "react": "latest",
     "react-dom": "latest",
     "server-only": "^0.0.1"
+=======
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "lucide-react": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest"
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   },
   "devDependencies": {
     "@tailwindcss/postcss": "latest",
@@ -35,7 +46,10 @@
     "postcss": "latest",
     "prisma": "^6.19.3",
     "tailwindcss": "latest",
+<<<<<<< HEAD
     "tsx": "^4.23.1",
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
     "typescript": "latest"
   }
 }

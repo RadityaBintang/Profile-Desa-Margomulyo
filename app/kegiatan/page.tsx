@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+<<<<<<< HEAD
 import { getAdminSession } from "@/lib/auth";
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
 type KegiatanItem = {
   id: number;
@@ -30,6 +33,7 @@ function getDateParts(date: Date) {
 }
 
 export default async function KegiatanPage() {
+<<<<<<< HEAD
   const [kegiatan, session] = await Promise.all([
     prisma.kegiatan.findMany({
       where: {
@@ -41,6 +45,16 @@ export default async function KegiatanPage() {
     }) as Promise<KegiatanItem[]>,
     getAdminSession(),
   ]);
+=======
+  const kegiatan: KegiatanItem[] = await prisma.kegiatan.findMany({
+    where: {
+      status: "publish" as any,
+    },
+    orderBy: {
+      tanggal: "desc",
+    },
+  });
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 
   return (
     <main className="kegiatan-page">
@@ -49,12 +63,15 @@ export default async function KegiatanPage() {
           <div className="kegiatan-hero-overlay">
             <h1>Kegiatan Desa</h1>
           </div>
+<<<<<<< HEAD
 
           {session && (
             <Link href="/kegiatan/tambah" className="kegiatan-admin-add-button">
               + Tambah Kegiatan
             </Link>
           )}
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
         </section>
 
         <section className="kegiatan-list-section">

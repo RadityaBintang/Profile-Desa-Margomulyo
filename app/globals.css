@@ -72,6 +72,7 @@ h3,
   margin: 0 auto;
 }
 
+<<<<<<< HEAD
 .navbar-admin-area {
   display: flex;
   align-items: center;
@@ -212,6 +213,8 @@ h3,
   cursor: not-allowed;
 }
 
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 .activity-form-page {
   min-height: 100vh;
   background: linear-gradient(180deg, #eef5ff 0%, #ffffff 100%);
@@ -496,6 +499,7 @@ h3,
   padding: 36px 0 72px;
 }
 
+<<<<<<< HEAD
 .detail-toolbar {
   display: flex;
   align-items: center;
@@ -518,10 +522,16 @@ h3,
   box-shadow: 0 8px 18px rgba(30, 91, 255, 0.25);
 }
 
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 .detail-back-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
+=======
+  margin-bottom: 24px;
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
   padding: 12px 18px;
   border-radius: 6px;
   background: #ffffff;
@@ -940,6 +950,7 @@ h3,
   letter-spacing: -0.5px;
 }
 
+<<<<<<< HEAD
 .kegiatan-admin-add-button {
   position: absolute;
   top: 16px;
@@ -962,6 +973,8 @@ h3,
   transform: translateY(-1px);
 }
 
+=======
+>>>>>>> 393ac64900f333a9f4a2269cbf90da9c2d054f1c
 .kegiatan-list-section {
   width: 100%;
 }
