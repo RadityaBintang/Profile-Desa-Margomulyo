@@ -742,3 +742,186 @@ h3,
   display: block;
   border: 0;
 }
+.kegiatan-page {
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 48px 0 80px;
+}
+
+.kegiatan-hero-banner {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 28px;
+  background-image: linear-gradient(
+      rgba(0, 94, 184, 0.72),
+      rgba(0, 94, 184, 0.72)
+    ),
+    url("/images/kegiatan/hero-kegiatan.jpg");
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 48px;
+}
+
+.kegiatan-hero-overlay {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.kegiatan-hero-overlay h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 38px;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.kegiatan-list-section {
+  width: 100%;
+}
+
+.kegiatan-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px 36px;
+}
+
+.kegiatan-card {
+  display: block;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #9ec9ff;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kegiatan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(11, 46, 111, 0.14);
+}
+
+.kegiatan-image-wrapper {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+  background: #dbeafe;
+}
+
+.kegiatan-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Badge tanggal biru di kiri atas */
+.kegiatan-date-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 78px;
+  height: 116px;
+  background: #0877d9;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%);
+  text-align: center;
+}
+
+.kegiatan-date-day {
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+.kegiatan-date-month {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.kegiatan-date-year {
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.kegiatan-card-content {
+  padding: 18px 18px 20px;
+}
+
+.kegiatan-card-content h2 {
+  margin: 0 0 8px;
+  color: #061b3a;
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: 900;
+}
+
+.kegiatan-card-content p {
+  margin: 0 0 18px;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.kegiatan-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.kegiatan-empty-state {
+  grid-column: 1 / -1;
+  padding: 40px;
+  border: 1px dashed #9ec9ff;
+  border-radius: 18px;
+  background: #f7fbff;
+  color: #0b2e6f;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .kegiatan-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .kegiatan-page {
+    padding: 32px 0 64px;
+  }
+
+  .kegiatan-hero-banner {
+    height: 130px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+  }
+
+  .kegiatan-hero-overlay h1 {
+    font-size: 28px;
+  }
+
+  .kegiatan-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kegiatan-image-wrapper {
+    height: 180px;
+  }
+}

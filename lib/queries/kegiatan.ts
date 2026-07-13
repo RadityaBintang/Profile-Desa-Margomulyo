@@ -1,10 +1,24 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getKegiatanTerbaru(limit = 3) {
+export async function getKegiatanTerbaru() {
   return prisma.kegiatan.findMany({
-    where: { status: "publish" },
-    orderBy: { tanggal: "desc" },
-    take: limit,
+    where: {
+      status: "publish" as any,
+    },
+    orderBy: {
+      tanggal: "desc",
+    },
+    take: 3,
+    select: {
+      id: true,
+      judul: true,
+      slug: true,
+      tanggal: true,
+      lokasi: true,
+      ringkasan: true,
+      gambar: true,
+      status: true,
+    },
   });
 }
 
