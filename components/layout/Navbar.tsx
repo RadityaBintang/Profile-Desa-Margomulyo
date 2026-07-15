@@ -5,11 +5,12 @@ import { logoutAdmin } from "@/app/actions/auth";
 
 const menus = [
   { label: "Beranda", href: "/" },
-  { label: "Profil Desa", href: "/profil" },
+ { label: "Profil Desa", href: "/profil/visi-misi" },
   { label: "Kegiatan", href: "/kegiatan" },
   { label: "Kelembagaan", href: "/kelembagaan" },
   { label: "Produk Hukum", href: "/produk-hukum" },
   { label: "Kontak", href: "/kontak" },
+  { label: "Perangkat Desa", href: "/profil/perangkat-desa" },
 ];
 
 export async function Navbar() {
