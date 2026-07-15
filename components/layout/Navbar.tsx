@@ -2,15 +2,14 @@ import Link from "next/link";
 import { LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { getAdminSession } from "@/lib/auth";
 import { logoutAdmin } from "@/app/actions/auth";
+import { ProfilDesaDropdown } from "./ProfilDesaDropdown";
 
 const menus = [
   { label: "Beranda", href: "/" },
- { label: "Profil Desa", href: "/profil/visi-misi" },
   { label: "Kegiatan", href: "/kegiatan" },
   { label: "Kelembagaan", href: "/kelembagaan" },
   { label: "Produk Hukum", href: "/produk-hukum" },
   { label: "Kontak", href: "/kontak" },
-  { label: "Perangkat Desa", href: "/profil/perangkat-desa" },
 ];
 
 export async function Navbar() {
@@ -31,7 +30,13 @@ export async function Navbar() {
 
         <div className="flex items-center gap-4">
           <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex">
-            {menus.map((menu) => (
+            <Link href={menus[0].href} className="transition hover:text-blue-600">
+              {menus[0].label}
+            </Link>
+
+            <ProfilDesaDropdown />
+
+            {menus.slice(1).map((menu) => (
               <Link key={menu.href} href={menu.href} className="transition hover:text-blue-600">
                 {menu.label}
               </Link>

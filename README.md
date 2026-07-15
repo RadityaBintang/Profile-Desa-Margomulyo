@@ -31,7 +31,6 @@ npm run dev
 ```
 
 Buka `http://localhost:3000`.
-<<<<<<< HEAD
 
 ## Fitur Login Admin
 
