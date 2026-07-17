@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { requireAdmin } from "@/lib/auth";
 
 async function saveIkonLembaga(file: File | null) {
   if (!file || file.size === 0) {
@@ -43,8 +44,9 @@ async function saveIkonLembaga(file: File | null) {
 }
 
 export async function updateIkonLembaga(id: number, formData: FormData) {
-  const file = formData.get("ikon") as File | null;
+  await requireAdmin();
 
+  const file = formData.get("ikon") as File | null;
   const imageUrl = await saveIkonLembaga(file);
 
   await prisma.lembagaDesa.update({

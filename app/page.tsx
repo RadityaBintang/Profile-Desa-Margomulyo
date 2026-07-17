@@ -12,19 +12,11 @@ import { getJamPelayanan } from "@/lib/queries/jam-pelayanan";
 import { getKegiatanTerbaru } from "@/lib/queries/kegiatan";
 import { getLembagaAktif } from "@/lib/queries/lembaga";
 import { getProdukHukumTerbaru } from "@/lib/queries/produk-hukum";
+import { getAdminSession } from "@/lib/auth";
 
-type HomePageProps = {
-  searchParams: Promise<{
-    admin?: string;
-  }>;
-};
-
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const params = await searchParams;
-
-  // Sementara untuk testing:
-  // buka http://localhost:3000/?admin=1
-  const isAdmin = params.admin === "1";
+export default async function HomePage() {
+  const session = await getAdminSession();
+  const isAdmin = session?.role === "admin";
 
   const [profil, video, jamPelayanan, kegiatan, lembaga, produkHukum] =
     await Promise.all([

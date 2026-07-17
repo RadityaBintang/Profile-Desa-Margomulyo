@@ -1165,4 +1165,236 @@ h3,
   .kegiatan-image-wrapper {
     height: 180px;
   }
+  .produk-hukum-section {
+  background: #eef7ff;
+  padding: 64px 0;
+}
+
+.produk-hukum-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.produk-hukum-line {
+  width: 5px;
+  height: 72px;
+  border-radius: 999px;
+  background: var(--blue-main);
+}
+
+.produk-hukum-heading p {
+  margin: 0;
+  color: var(--blue-main);
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.produk-hukum-heading h2 {
+  margin: 2px 0 0;
+  color: #020617;
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 900;
+}
+
+.produk-hukum-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+.produk-hukum-card {
+  min-height: 230px;
+  border: 1px solid #7dbbff;
+  background: #cfe6f8;
+  padding: 30px 24px 24px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.produk-hukum-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(11, 46, 111, 0.14);
+}
+
+.produk-hukum-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 24px;
+  border: 1.5px solid var(--blue-main);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--blue-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produk-hukum-card h3 {
+  min-height: 54px;
+  margin: 0;
+  color: #020617;
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.produk-hukum-button {
+  width: 100%;
+  margin-top: 22px;
+  min-height: 46px;
+  border: 1px solid var(--blue-main);
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--blue-main);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.produk-hukum-button:hover {
+  background: var(--blue-main);
+  color: #ffffff;
+}
+
+.produk-hukum-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.produk-hukum-popup {
+  position: relative;
+  width: min(680px, 100%);
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 34px;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.25);
+}
+
+.produk-hukum-popup-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produk-hukum-popup-close:hover {
+  background: #e2e8f0;
+}
+
+.produk-hukum-popup-icon {
+  width: 72px;
+  height: 72px;
+  border: 1.5px solid var(--blue-main);
+  border-radius: 999px;
+  background: #eef7ff;
+  color: var(--blue-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.produk-hukum-popup-label {
+  margin: 22px 0 0;
+  color: var(--blue-main);
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.produk-hukum-popup h3 {
+  margin: 8px 0 0;
+  color: #020617;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.produk-hukum-popup-line {
+  width: 80px;
+  height: 4px;
+  margin: 18px 0 22px;
+  border-radius: 999px;
+  background: var(--blue-main);
+}
+
+.produk-hukum-popup p {
+  color: #334155;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.produk-hukum-popup-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 26px;
+}
+
+.produk-hukum-popup-button {
+  border: none;
+  border-radius: 999px;
+  background: var(--blue-main);
+  color: #ffffff;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.produk-hukum-popup-button:hover {
+  background: #174be0;
+}
+
+@media (max-width: 1024px) {
+  .produk-hukum-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .produk-hukum-section {
+    padding: 48px 0;
+  }
+
+  .produk-hukum-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .produk-hukum-heading h2 {
+    font-size: 32px;
+  }
+
+  .produk-hukum-popup {
+    padding: 28px 22px;
+  }
+
+  .produk-hukum-popup h3 {
+    font-size: 24px;
+  }
+}
 }
