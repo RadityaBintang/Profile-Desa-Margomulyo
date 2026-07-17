@@ -1,24 +1,30 @@
-import { SectionTitle } from "@/components/ui/SectionTitle";
-import { getLayananAktif } from "@/lib/queries/layanan";
+import { LayananPublikContent } from "@/components/layanan/LayananPublikContent";
 
-export default async function LayananPage() {
-  const layanan = await getLayananAktif();
+export const metadata = {
+  title: "Layanan Publik - Desa Margomulyo",
+};
 
+export default function LayananPage() {
   return (
-    <main className="container-desa py-16">
-      <SectionTitle title="Layanan Desa" />
-      <div className="grid gap-6 md:grid-cols-3">
-        {layanan.map((item) => (
-          <article key={item.id} className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h2 className="text-xl font-bold text-slate-900">{item.namaLayanan}</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{item.deskripsi}</p>
-            <div className="mt-5 rounded-2xl bg-blue-50 p-4 text-sm text-slate-700">
-              <p><strong>Estimasi:</strong> {item.estimasiWaktu || "-"}</p>
-              <p><strong>Biaya:</strong> {item.biaya || "-"}</p>
-            </div>
-          </article>
-        ))}
-      </div>
+    <main className="bg-white">
+      <section className="container-desa py-12">
+        <div
+          className="relative overflow-hidden rounded-[28px] bg-blue-700 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(0, 92, 180, 0.72), rgba(0, 92, 180, 0.72)), url('/images/kegiatan/hero-kegiatan.jpg')",
+          }}
+        >
+          <div className="flex min-h-[140px] flex-col items-center justify-center px-6 text-center text-white">
+            <p className="text-sm font-extrabold uppercase tracking-wide">Profil Desa</p>
+            <h1 className="mt-1 text-3xl font-black md:text-4xl">Layanan Publik</h1>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <LayananPublikContent />
+        </div>
+      </section>
     </main>
   );
 }
