@@ -7,7 +7,6 @@ import { ProfilDesaDropdown } from "./ProfilDesaDropdown";
 const menus = [
   { label: "Beranda", href: "/" },
   { label: "Kegiatan", href: "/kegiatan" },
-  { label: "Kelembagaan", href: "/kelembagaan" },
   { label: "Produk Hukum", href: "/produk-hukum" },
   { label: "Kontak", href: "/kontak" },
 ];
