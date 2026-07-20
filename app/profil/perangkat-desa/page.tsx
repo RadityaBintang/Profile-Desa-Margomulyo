@@ -1,11 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getAdminSession } from "@/lib/auth";
 import { updatePerangkatDesa } from "./actions";
-
-type PageProps = {
-  searchParams: Promise<{
-    admin?: string;
-  }>;
-};
 
 type PerangkatItem = {
   id: number;
@@ -14,13 +9,11 @@ type PerangkatItem = {
   foto: string | null;
 };
 
-export default async function PerangkatDesaPage({ searchParams }: PageProps) {
-  const params = await searchParams;
+export default async function PerangkatDesaPage() {
+  const session = await getAdminSession();
 
-  // Sementara:
-  // /profil/perangkat-desa       -> tampilan biasa
-  // /profil/perangkat-desa?admin=1 -> mode edit admin
-  const isAdmin = params.admin === "1";
+  // Jika sudah login admin, mode edit otomatis aktif.
+  const isAdmin = Boolean(session);
 
   const perangkat = await prisma.perangkatDesa.findMany({
     where: {

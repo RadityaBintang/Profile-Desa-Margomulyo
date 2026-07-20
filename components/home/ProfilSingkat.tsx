@@ -9,11 +9,20 @@ type Profil = {
   fotoKantor: string | null;
 };
 
-export function ProfilSingkat({ profil }: { profil: Profil | null }) {
+export function ProfilSingkat({
+  profil,
+  isAdmin = false,
+}: {
+  profil: Profil | null;
+  isAdmin?: boolean;
+}) {
   return (
     <section className="py-20">
       <div className="container-desa grid items-center gap-10 lg:grid-cols-2">
-        <FotoDesaUpload imageUrl={profil?.fotoKantor} />
+        <FotoDesaUpload
+          imageUrl={profil?.fotoKantor}
+          isAdmin={isAdmin}
+        />
 
         <div>
           <SectionTitle

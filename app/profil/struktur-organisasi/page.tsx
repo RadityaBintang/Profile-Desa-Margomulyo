@@ -1,11 +1,23 @@
-export const metadata = {
-  title: "Struktur Organisasi - Desa Margomulyo",
-};
+import { prisma } from "@/lib/prisma";
+import { getAdminSession } from "@/lib/auth";
+import { StrukturOrganisasiUpload } from "@/components/home/StrukturOrganisasiUpload";
 
-export default function StrukturOrganisasiPage() {
+export default async function StrukturOrganisasiPage() {
+  const session = await getAdminSession();
+  const isAdmin = Boolean(session);
+
+  const profil = await prisma.profilDesa.findFirst({
+    orderBy: {
+      id: "asc",
+    },
+    select: {
+      strukturOrganisasi: true,
+    },
+  });
+
   return (
-    <main className="bg-white">
-      <section className="container-desa py-12">
+    <main className="min-h-screen bg-white pb-20">
+      <section className="container-desa py-10">
         <div
           className="relative overflow-hidden rounded-[28px] bg-blue-700 bg-cover bg-center"
           style={{
@@ -14,16 +26,26 @@ export default function StrukturOrganisasiPage() {
           }}
         >
           <div className="flex min-h-[140px] flex-col items-center justify-center px-6 text-center text-white">
-            <p className="text-sm font-extrabold uppercase tracking-wide">Profil Desa</p>
-            <h1 className="mt-1 text-3xl font-black md:text-4xl">Struktur Organisasi</h1>
+            <p className="text-sm font-extrabold uppercase tracking-wide">
+              Profil Desa
+            </p>
+            <h1 className="mt-1 text-3xl font-black md:text-4xl">
+              Struktur Organisasi
+            </h1>
           </div>
         </div>
 
-        <div className="mx-auto mt-12 max-w-5xl overflow-x-auto">
-          <img
-            src="/images/struktur-organisasi/struktur-organisasi.png"
-            alt="Bagan Struktur Organisasi Desa Margomulyo"
-            className="mx-auto w-full min-w-[700px]"
+        {isAdmin && (
+          <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-blue-100 bg-blue-50 p-4 text-center text-sm font-semibold text-blue-800">
+            Mode admin aktif. Kamu dapat mengupload atau mengganti gambar
+            struktur organisasi desa.
+          </div>
+        )}
+
+        <div className="mx-auto mt-10 max-w-5xl">
+          <StrukturOrganisasiUpload
+            imageUrl={profil?.strukturOrganisasi}
+            isAdmin={isAdmin}
           />
         </div>
       </section>

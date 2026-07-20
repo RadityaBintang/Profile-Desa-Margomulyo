@@ -32,7 +32,7 @@ export default async function HomePage() {
     <main>
       <HeroVideo videoUrl={video?.urlVideo} />
       <JamPelayanan data={jamPelayanan} />
-      <ProfilSingkat profil={profil} />
+<ProfilSingkat profil={profil} isAdmin={isAdmin} />
       <KegiatanSection data={kegiatan} />
       <KelembagaanSection data={lembaga} isAdmin={isAdmin} />
       <ProdukHukumSection data={produkHukum} />

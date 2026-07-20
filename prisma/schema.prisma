@@ -19,24 +19,25 @@ model Admin {
 }
 
 model ProfilDesa {
-  id         Int      @id @default(autoincrement())
-  namaDesa   String   @map("nama_desa") @db.VarChar(100)
-  kecamatan  String?  @db.VarChar(100)
-  kabupaten  String?  @db.VarChar(100)
-  provinsi   String?  @db.VarChar(100)
-  alamat     String?  @db.Text
-  kodePos    String?  @map("kode_pos") @db.VarChar(10)
-  email      String?  @db.VarChar(100)
-  telepon    String?  @db.VarChar(30)
-  whatsapp   String?  @db.VarChar(30)
-  deskripsi  String?  @db.Text
-  visi       String?  @db.Text
-  misi       String?  @db.Text
-  logo       String?  @db.VarChar(255)
-  fotoKantor String?  @map("foto_kantor") @db.VarChar(255)
-  mapsEmbed  String?  @map("maps_embed") @db.Text
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  id                  Int      @id @default(autoincrement())
+  namaDesa            String   @map("nama_desa") @db.VarChar(100)
+  kecamatan           String?  @db.VarChar(100)
+  kabupaten           String?  @db.VarChar(100)
+  provinsi            String?  @db.VarChar(100)
+  alamat              String?  @db.Text
+  kodePos             String?  @map("kode_pos") @db.VarChar(10)
+  email               String?  @db.VarChar(100)
+  telepon             String?  @db.VarChar(30)
+  whatsapp            String?  @db.VarChar(30)
+  deskripsi           String?  @db.Text
+  visi                String?  @db.Text
+  misi                String?  @db.Text
+  logo                String?  @db.VarChar(255)
+  fotoKantor          String?  @map("foto_kantor") @db.VarChar(255)
+  mapsEmbed           String?  @map("maps_embed") @db.Text
+  strukturOrganisasi  String?  @map("struktur_organisasi") @db.VarChar(255)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
 
   @@map("profil_desa")
 }
