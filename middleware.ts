@@ -8,6 +8,8 @@ const SESSION_COOKIE_NAME = "admin_session";
 const ADMIN_ONLY_PATTERNS: RegExp[] = [
   /^\/kegiatan\/tambah$/,
   /^\/kegiatan\/[^/]+\/edit$/,
+  /^\/layanan\/tambah$/,
+  /^\/layanan\/[^/]+\/edit$/,
 ];
 
 function isAdminOnlyPath(pathname: string) {
@@ -45,5 +47,5 @@ function redirectToLogin(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/kegiatan/tambah", "/kegiatan/:slug/edit"],
+  matcher: ["/kegiatan/tambah", "/kegiatan/:slug/edit", "/layanan/tambah", "/layanan/:id/edit"],
 };

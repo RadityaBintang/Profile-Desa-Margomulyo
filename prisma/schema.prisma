@@ -136,12 +136,12 @@ model ProdukHukum {
 model LayananDesa {
   id            Int          @id @default(autoincrement())
   namaLayanan   String       @map("nama_layanan") @db.VarChar(150)
+  kategori      String       @default("Umum") @db.VarChar(100)
   deskripsi     String?      @db.Text
   persyaratan   String?      @db.Text
-  alurLayanan   String?      @map("alur_layanan") @db.Text
-  estimasiWaktu String?      @map("estimasi_waktu") @db.VarChar(100)
-  biaya         String?      @db.VarChar(100)
   ikon          String?      @db.VarChar(255)
+  tampilanBesar Boolean      @default(false) @map("tampilan_besar")
+  urutan        Int          @default(0)
   status        StatusAktif? @default(aktif)
   createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
   updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)

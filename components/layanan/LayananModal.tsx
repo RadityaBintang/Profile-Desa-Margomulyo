@@ -2,15 +2,64 @@
 
 import { useEffect } from "react";
 import { Phone, X } from "lucide-react";
-import { waCenter, type LayananItem } from "@/lib/data/LayananPublik";
+import type { LayananDesa } from "@prisma/client";
 
-export function LayananModal({
-  item,
-  onClose,
-}: {
-  item: LayananItem;
-  onClose: () => void;
-}) {
+const waCenter: { wilayah: string; nomor: string; cakupan: string }[] = [
+  {
+    wilayah: "Wilayah Barat",
+    nomor: "0895-3332-22226",
+    cakupan: "Srengat, Wonodadi, Udanawu, Ponggok, Sanankulon",
+  },
+  {
+    wilayah: "Wilayah Tengah",
+    nomor: "0895-3332-22227",
+    cakupan:
+      "Kanigoro, Sutojaya, Garum, Talun, Wonotirto, Kademangan, Bakung, Panggungrejo, Nglegok",
+  },
+  {
+    wilayah: "Wilayah Timur",
+    nomor: "0895-3332-22228",
+    cakupan: "Selorejo, Wlingi, Kesamben, Doko, Gandungsari, Binangun, Wates, Selopuro",
+  },
+];
+
+type PersyaratanGroup = {
+  /** null = daftar rata tanpa sub-judul */
+  header: string | null;
+  items: string[];
+};
+
+/**
+ * Baris yang diakhiri tanda titik dua (":") dianggap sub-judul baru.
+ * Baris "Catatan:" dikasih gaya kotak highlight khusus.
+ * Ini murni logika tampilan — tidak butuh perubahan di form/database.
+ */
+function parsePersyaratan(text: string | null): PersyaratanGroup[] {
+  const lines = (text || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const groups: PersyaratanGroup[] = [];
+  let current: PersyaratanGroup = { header: null, items: [] };
+  let currentHasContent = false;
+
+  for (const line of lines) {
+    if (line.endsWith(":")) {
+      if (currentHasContent) groups.push(current);
+      current = { header: line.slice(0, -1), items: [] };
+      currentHasContent = true;
+    } else {
+      current.items.push(line);
+      currentHasContent = true;
+    }
+  }
+  if (currentHasContent) groups.push(current);
+
+  return groups;
+}
+
+export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: () => void }) {
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -25,7 +74,7 @@ export function LayananModal({
     };
   }, [onClose]);
 
-  const { persyaratan } = item;
+  const groups = parsePersyaratan(item.persyaratan);
 
   return (
     <div
@@ -41,7 +90,7 @@ export function LayananModal({
             <p className="text-xs font-bold uppercase tracking-wide text-blue-600">
               Persyaratan
             </p>
-            <h3 className="mt-1 text-xl font-black text-slate-900">{item.title}</h3>
+            <h3 className="mt-1 text-xl font-black text-slate-900">{item.namaLayanan}</h3>
           </div>
           <button
             type="button"
@@ -54,45 +103,49 @@ export function LayananModal({
         </div>
 
         <div className="mt-5 space-y-5 text-sm leading-6 text-slate-700">
-          {persyaratan.belumTersedia ? (
+          {groups.length === 0 ? (
             <p className="rounded-2xl bg-amber-50 p-4 text-amber-800">
               Persyaratan untuk layanan ini belum kami lengkapi. Silakan hubungi
               WA Center desa untuk informasi lebih lanjut.
             </p>
           ) : (
-            <>
-              {persyaratan.intro && <p>{persyaratan.intro}</p>}
+            groups.map((group, groupIndex) => {
+              if (group.header === null) {
+                return (
+                  <ol key={groupIndex} className="list-decimal space-y-2 pl-5">
+                    {group.items.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ol>
+                );
+              }
 
-              {persyaratan.list && (
-                <ol className="list-decimal space-y-2 pl-5">
-                  {persyaratan.list.map((line) => (
-                    <li key={line}>{line}</li>
-                  ))}
-                </ol>
-              )}
+              const isCatatan = group.header.toLowerCase().startsWith("catatan");
 
-              {persyaratan.subsections?.map((sub) => (
-                <div key={sub.title}>
-                  <p className="font-bold text-slate-900">{sub.title}</p>
+              if (isCatatan) {
+                return (
+                  <div key={groupIndex} className="rounded-2xl bg-blue-50 p-4">
+                    <p className="font-bold text-blue-900">{group.header}:</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-blue-900">
+                      {group.items.map((line, i) => (
+                        <li key={i}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={groupIndex}>
+                  <p className="font-bold text-slate-900">{group.header}:</p>
                   <ul className="mt-2 list-disc space-y-2 pl-5">
-                    {sub.list.map((line) => (
-                      <li key={line}>{line}</li>
+                    {group.items.map((line, i) => (
+                      <li key={i}>{line}</li>
                     ))}
                   </ul>
                 </div>
-              ))}
-
-              {persyaratan.catatan && (
-                <div className="rounded-2xl bg-blue-50 p-4">
-                  <p className="font-bold text-blue-900">Catatan:</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-blue-900">
-                    {persyaratan.catatan.map((line) => (
-                      <li key={line}>{line}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </>
+              );
+            })
           )}
 
           <div className="rounded-2xl border border-slate-200 p-4">

@@ -1,10 +1,14 @@
 import { LayananPublikContent } from "@/components/layanan/LayananPublikContent";
+import { getLayananAktif } from "@/lib/queries/layanan";
+import { getAdminSession } from "@/lib/auth";
 
 export const metadata = {
   title: "Layanan Publik - Desa Margomulyo",
 };
 
-export default function LayananPage() {
+export default async function LayananPage() {
+  const [items, session] = await Promise.all([getLayananAktif(), getAdminSession()]);
+
   return (
     <main className="bg-white">
       <section className="container-desa py-12">
@@ -22,7 +26,7 @@ export default function LayananPage() {
         </div>
 
         <div className="mt-12">
-          <LayananPublikContent />
+          <LayananPublikContent items={items} isAdmin={Boolean(session)} />
         </div>
       </section>
     </main>
