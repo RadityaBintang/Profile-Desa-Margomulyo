@@ -21,7 +21,7 @@ export function Footer() {
         </div>
         <div>
           <h4 className="font-semibold">Kontak</h4>
-          <p className="mt-4 text-sm leading-6 text-blue-100">Jl. Raya Margomulyo No. 01<br />desamargomulyo@gmail.com<br />(0274) 123456</p>
+          <p className="mt-4 text-sm leading-6 text-blue-100">Jl. Protokol No. 27, Rampal Lombo<br />desamargomulyo@gmail.com<br />(0274) 123456</p>
         </div>
       </div>
       <div className="border-t border-blue-800 py-4 text-center text-sm text-blue-100">© 2026 Desa Margomulyo. All rights reserved.</div>

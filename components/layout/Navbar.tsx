@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogIn, LogOut, ShieldCheck } from "lucide-react";
+import { BookOpen, LogIn, LogOut, ShieldCheck } from "lucide-react";
 import { getAdminSession } from "@/lib/auth";
 import { logoutAdmin } from "@/app/actions/auth";
 import { ProfilDesaDropdown } from "./ProfilDesaDropdown";
@@ -33,15 +33,22 @@ export async function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex">
-            <Link
-              href={menus[0].href}
-              className="transition hover:text-blue-600"
-            >
-              {menus[0].label}
-            </Link>
+         <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex">
+  {session && (
+    <Link
+      href="/admin/link-website"
+      className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100 transition hover:bg-blue-100"
+      title="Link Website Admin"
+    >
+      <BookOpen size={18} />
+    </Link>
+  )}
 
-            <ProfilDesaDropdown />
+  <Link href={menus[0].href} className="transition hover:text-blue-600">
+    {menus[0].label}
+  </Link>
+
+  <ProfilDesaDropdown />
 
             {menus.slice(1).map((menu) => (
               <Link
