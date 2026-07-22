@@ -3,41 +3,42 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Admin {
   id        Int      @id @default(autoincrement())
-  username  String   @unique(map: "username") @db.VarChar(50)
+  username  String   @unique @db.VarChar(50)
   password  String   @db.VarChar(255)
   nama      String?  @db.VarChar(100)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("admin")
 }
 
 model ProfilDesa {
-  id                  Int      @id @default(autoincrement())
-  namaDesa            String   @map("nama_desa") @db.VarChar(100)
-  kecamatan           String?  @db.VarChar(100)
-  kabupaten           String?  @db.VarChar(100)
-  provinsi            String?  @db.VarChar(100)
-  alamat              String?  @db.Text
-  kodePos             String?  @map("kode_pos") @db.VarChar(10)
-  email               String?  @db.VarChar(100)
-  telepon             String?  @db.VarChar(30)
-  whatsapp            String?  @db.VarChar(30)
-  deskripsi           String?  @db.Text
-  visi                String?  @db.Text
-  misi                String?  @db.Text
-  logo                String?  @db.VarChar(255)
-  fotoKantor          String?  @map("foto_kantor") @db.VarChar(255)
-  mapsEmbed           String?  @map("maps_embed") @db.Text
-  strukturOrganisasi  String?  @map("struktur_organisasi") @db.VarChar(255)
-  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  id                 Int      @id @default(autoincrement())
+  namaDesa           String   @map("nama_desa") @db.VarChar(100)
+  kecamatan          String?  @db.VarChar(100)
+  kabupaten          String?  @db.VarChar(100)
+  provinsi           String?  @db.VarChar(100)
+  alamat             String?  @db.Text
+  kodePos            String?  @map("kode_pos") @db.VarChar(10)
+  email              String?  @db.VarChar(100)
+  telepon            String?  @db.VarChar(30)
+  whatsapp           String?  @db.VarChar(30)
+  deskripsi          String?  @db.Text
+  visi               String?  @db.Text
+  misi               String?  @db.Text
+  logo               String?  @db.VarChar(255)
+  fotoKantor         String?  @map("foto_kantor") @db.VarChar(255)
+  mapsEmbed          String?  @map("maps_embed") @db.Text
+  strukturOrganisasi String?  @map("struktur_organisasi") @db.VarChar(255)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("profil_desa")
 }
@@ -49,8 +50,8 @@ model VideoProfil {
   urlVideo  String       @map("url_video") @db.VarChar(255)
   thumbnail String?      @db.VarChar(255)
   status    StatusAktif? @default(aktif)
-  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("video_profil")
 }
@@ -58,12 +59,12 @@ model VideoProfil {
 model JamPelayanan {
   id         Int       @id @default(autoincrement())
   hari       String    @db.VarChar(100)
-  jamBuka    DateTime? @map("jam_buka") @db.Time(0)
-  jamTutup   DateTime? @map("jam_tutup") @db.Time(0)
+  jamBuka    DateTime? @map("jam_buka") @db.Time
+  jamTutup   DateTime? @map("jam_tutup") @db.Time
   keterangan String?   @db.VarChar(100)
   urutan     Int?      @default(0)
-  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("jam_pelayanan")
 }
@@ -71,16 +72,16 @@ model JamPelayanan {
 model Kegiatan {
   id        Int              @id @default(autoincrement())
   judul     String           @db.VarChar(200)
-  slug      String?          @unique(map: "slug") @db.VarChar(220)
+  slug      String?          @unique @db.VarChar(220)
   tanggal   DateTime         @db.Date
   lokasi    String?          @db.VarChar(150)
   kategori  String?          @db.VarChar(100)
   ringkasan String?          @db.Text
-  isi       String?          @db.LongText
+  isi       String?          @db.Text
   gambar    String?          @db.VarChar(255)
   status    StatusPublikasi? @default(draft)
-  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("kegiatan")
 }
@@ -95,8 +96,8 @@ model LembagaDesa {
   ikon        String?          @db.VarChar(255)
   foto        String?          @db.VarChar(255)
   status      StatusAktif?     @default(aktif)
-  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   anggota     AnggotaLembaga[]
 
   @@map("lembaga_desa")
@@ -109,11 +110,11 @@ model AnggotaLembaga {
   jabatan   String?     @db.VarChar(100)
   foto      String?     @db.VarChar(255)
   urutan    Int?        @default(0)
-  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
-  lembaga   LembagaDesa @relation(fields: [lembagaId], references: [id], onDelete: Cascade, map: "fk_anggota_lembaga")
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  lembaga   LembagaDesa @relation(fields: [lembagaId], references: [id], onDelete: Cascade)
 
-  @@index([lembagaId], map: "fk_anggota_lembaga")
+  @@index([lembagaId], map: "idx_anggota_lembaga_lembaga_id")
   @@map("anggota_lembaga")
 }
 
@@ -121,14 +122,14 @@ model ProdukHukum {
   id                Int              @id @default(autoincrement())
   jenis             JenisProdukHukum
   nomor             String           @db.VarChar(100)
-  tahun             Int              @db.Year
+  tahun             Int
   judul             String           @db.VarChar(255)
   tanggalDitetapkan DateTime?        @map("tanggal_ditetapkan") @db.Date
   fileDokumen       String?          @map("file_dokumen") @db.VarChar(255)
   keterangan        String?          @db.Text
   status            StatusPublikasi? @default(publish)
-  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("produk_hukum")
 }
@@ -143,8 +144,8 @@ model LayananDesa {
   tampilanBesar Boolean      @default(false) @map("tampilan_besar")
   urutan        Int          @default(0)
   status        StatusAktif? @default(aktif)
-  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("layanan_desa")
 }
@@ -157,10 +158,23 @@ model KontakDesa {
   email      String?     @db.VarChar(100)
   alamat     String?     @db.Text
   tipe       TipeKontak? @default(Kantor_Desa)
-  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(0)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("kontak_desa")
+}
+
+model PerangkatDesa {
+  id        Int       @id @default(autoincrement())
+  nama      String    @db.VarChar(100)
+  jabatan   String    @db.VarChar(150)
+  foto      String?   @db.VarChar(255)
+  urutan    Int?      @default(0)
+  status    String?   @default("aktif") @db.VarChar(20)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("perangkat_desa")
 }
 
 enum StatusAktif {
@@ -188,17 +202,4 @@ enum TipeKontak {
   Perangkat_Desa @map("Perangkat Desa")
   Layanan
   Lainnya
-}
-
-model PerangkatDesa {
-  id        Int       @id @default(autoincrement())
-  nama      String    @db.VarChar(100)
-  jabatan   String    @db.VarChar(150)
-  foto      String?   @db.VarChar(255)
-  urutan    Int?      @default(0)
-  status    String?   @default("aktif") @db.VarChar(20)
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamp(0)
-
-  @@map("perangkat_desa")
 }
