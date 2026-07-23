@@ -6,18 +6,27 @@ import { SignJWT, jwtVerify } from "jose";
 const SESSION_COOKIE_NAME = "admin_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 8; // 8 jam
 
-function getSecretKey() {
-  const secret = process.env.AUTH_SECRET;
+function getSecretKey(): Uint8Array {
+  const secret =
+    process.env.ADMIN_AUTH_SECRET?.trim() ||
+    process.env.AUTH_SECRET?.trim();
 
   if (!secret) {
     throw new Error(
-      "AUTH_SECRET belum diatur di file .env. Tambahkan AUTH_SECRET sebelum menjalankan fitur login."
+      `ADMIN_AUTH_SECRET tidak ditemukan pada environment ${
+        process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown"
+      }.`
+    );
+  }
+
+  if (secret.length < 32) {
+    throw new Error(
+      "ADMIN_AUTH_SECRET minimal harus berisi 32 karakter."
     );
   }
 
   return new TextEncoder().encode(secret);
 }
-
 export type AdminSession = {
   adminId: number;
   username: string;
