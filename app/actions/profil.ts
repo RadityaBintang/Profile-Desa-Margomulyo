@@ -75,8 +75,7 @@ export async function updateFotoDesa(formData: FormData) {
         kabupaten: "Blitar",
         provinsi: "Jawa Timur",
         alamat: "Kantor Desa Margomulyo Panggungrejo Blitar",
-        email: "desamargomulyo@gmail.com",
-        telepon: "(0342) 123456",
+        telepon: "(+62) 816-1545-3303",
         deskripsi:
           "Desa Margomulyo merupakan desa yang berkomitmen dalam memberikan pelayanan publik yang baik, transparan, dan mudah diakses masyarakat.",
         fotoKantor: imageUrl,

@@ -35,12 +35,12 @@ export function KontakLokasi({ profil }: { profil: Profil | null }) {
 
               <p className="flex gap-3">
                 <Phone className="shrink-0 text-blue-600" />
-                <span>{profil?.telepon || "(0274) 123456"}</span>
+                <span>{profil?.telepon || "(+62) 816-1545-3303"}</span>
               </p>
 
               <p className="flex gap-3">
                 <Mail className="shrink-0 text-blue-600" />
-                <span>{profil?.email || "desamargomulyo@gmail.com"}</span>
+                <span>{profil?.email || "-"}</span>
               </p>
             </div>
           </div>

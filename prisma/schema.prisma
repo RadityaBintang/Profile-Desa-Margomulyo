@@ -119,17 +119,17 @@ model AnggotaLembaga {
 }
 
 model ProdukHukum {
-  id                Int                @id @default(autoincrement())
+  id                Int              @id @default(autoincrement())
   jenis             JenisProdukHukum
-  nomor             String             @db.VarChar(100)
+  nomor             String           @db.VarChar(100)
   tahun             Int
-  judul             String             @db.VarChar(255)
-  tanggalDitetapkan DateTime?          @map("tanggal_ditetapkan") @db.Date
-  fileDokumen       String?            @map("file_dokumen") @db.VarChar(255)
+  judul             String           @db.VarChar(255)
+  tanggalDitetapkan DateTime?        @map("tanggal_ditetapkan") @db.Date
+  fileDokumen       String?          @map("file_dokumen") @db.VarChar(255)
   keterangan        String?
-  status            StatusPublikasi?   @default(publish)
-  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime           @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  status            StatusPublikasi? @default(publish)
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("produk_hukum")
 }
