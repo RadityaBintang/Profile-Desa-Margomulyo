@@ -1,27 +1,28 @@
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/auth";
-import { updatePerangkatDesa } from "./actions";
+import {
+  createPerangkatDesa,
+  deletePerangkatDesa,
+  updatePerangkatDesa,
+} from "./actions";
 
 type PerangkatItem = {
   id: number;
   nama: string;
   jabatan: string;
   foto: string | null;
+  urutan: number | null;
 };
 
 export default async function PerangkatDesaPage() {
   const session = await getAdminSession();
-
-  // Jika sudah login admin, mode edit otomatis aktif.
   const isAdmin = Boolean(session);
 
   const perangkat = await prisma.perangkatDesa.findMany({
     where: {
       status: "aktif",
     },
-    orderBy: {
-      urutan: "asc",
-    },
+    orderBy: [{ urutan: "asc" }, { id: "asc" }],
   });
 
   const kepalaDesa = perangkat[0];
@@ -49,9 +50,79 @@ export default async function PerangkatDesaPage() {
         </div>
 
         {isAdmin && (
+          <div className="mx-auto mt-8 max-w-4xl rounded-3xl border border-blue-100 bg-blue-50 p-6">
+            <h2 className="text-xl font-black text-blue-950">
+              Tambah Perangkat Desa
+            </h2>
+
+            <form
+              action={createPerangkatDesa}
+              className="mt-5 grid gap-4 md:grid-cols-[1fr_1fr_120px] md:items-end"
+            >
+              <div>
+                <label className="text-sm font-bold text-slate-700">
+                  Nama
+                </label>
+                <input
+                  name="nama"
+                  type="text"
+                  placeholder="Nama perangkat desa"
+                  required
+                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-slate-700">
+                  Jabatan
+                </label>
+                <input
+                  name="jabatan"
+                  type="text"
+                  placeholder="Jabatan"
+                  required
+                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-bold text-slate-700">
+                  Urutan
+                </label>
+                <input
+                  name="urutan"
+                  type="number"
+                  defaultValue={perangkat.length + 1}
+                  className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm font-bold text-slate-700">
+                  Foto
+                </label>
+                <input
+                  name="foto"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-800"
+              >
+                Tambah
+              </button>
+            </form>
+          </div>
+        )}
+
+        {isAdmin && (
           <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-blue-100 bg-blue-50 p-4 text-center text-sm font-semibold text-blue-800">
-            Mode admin aktif. Foto, nama, dan jabatan perangkat desa dapat
-            diedit langsung dari halaman ini.
+            Mode admin aktif. Kamu dapat menambah, mengedit, menghapus, dan
+            mengupload foto perangkat desa.
           </div>
         )}
 
@@ -73,6 +144,12 @@ export default async function PerangkatDesaPage() {
               <PerangkatCard key={item.id} item={item} isAdmin={isAdmin} />
             ))}
           </div>
+
+          {perangkat.length === 0 && (
+            <p className="mt-10 text-center text-slate-500">
+              Belum ada data perangkat desa.
+            </p>
+          )}
         </div>
       </section>
     </main>
@@ -136,62 +213,79 @@ function EditablePerangkatCard({
   besar?: boolean;
 }) {
   const updateById = updatePerangkatDesa.bind(null, item.id);
+  const deleteById = deletePerangkatDesa.bind(null, item.id);
 
   return (
-    <form
-      action={updateById}
-      className="w-full max-w-[260px] rounded-3xl border border-blue-100 bg-white p-4 text-center shadow-md"
-    >
-      <input type="hidden" name="foto_lama" value={item.foto || ""} />
+    <div className="w-full max-w-[280px] rounded-3xl border border-blue-100 bg-white p-4 text-center shadow-md">
+      <form action={updateById}>
+        <input type="hidden" name="foto_lama" value={item.foto || ""} />
 
-      <div
-        className={`relative mx-auto overflow-hidden rounded-2xl bg-blue-100 ${
-          besar ? "h-40 w-40" : "h-36 w-36"
-        }`}
-      >
-        {item.foto ? (
-          <img
-            src={item.foto}
-            alt={item.nama}
-            className="h-full w-full object-cover"
+        <div
+          className={`relative mx-auto overflow-hidden rounded-2xl bg-blue-100 ${
+            besar ? "h-40 w-40" : "h-36 w-36"
+          }`}
+        >
+          {item.foto ? (
+            <img
+              src={item.foto}
+              alt={item.nama}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center p-4 text-center text-xs font-bold text-blue-800">
+              Foto Perangkat
+            </div>
+          )}
+        </div>
+
+        <label className="mt-3 block cursor-pointer rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100">
+          Upload / Ganti Foto
+          <input
+            type="file"
+            name="foto"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
           />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center p-4 text-center text-xs font-bold text-blue-800">
-            Foto Perangkat
-          </div>
-        )}
-      </div>
+        </label>
 
-      <label className="mt-3 block cursor-pointer rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 ring-1 ring-blue-200 transition hover:bg-blue-100">
-        Ganti Foto
         <input
-          type="file"
-          name="foto"
-          accept="image/jpeg,image/png,image/webp"
-          className="hidden"
+          name="nama"
+          defaultValue={item.nama}
+          placeholder="Nama perangkat"
+          className="mt-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-black text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
-      </label>
 
-      <input
-        name="nama"
-        defaultValue={item.nama}
-        placeholder="Nama perangkat"
-        className="mt-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-center text-sm font-black text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
+        <input
+          name="jabatan"
+          defaultValue={item.jabatan}
+          placeholder="Jabatan"
+          className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-center text-xs text-slate-600 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
 
-      <input
-        name="jabatan"
-        defaultValue={item.jabatan}
-        placeholder="Jabatan"
-        className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-center text-xs text-slate-600 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
+        <input
+          name="urutan"
+          type="number"
+          defaultValue={item.urutan || 0}
+          placeholder="Urutan"
+          className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-center text-xs text-slate-600 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
 
-      <button
-        type="submit"
-        className="mt-3 w-full rounded-full bg-blue-700 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-800"
-      >
-        Simpan Perubahan
-      </button>
-    </form>
+        <button
+          type="submit"
+          className="mt-3 w-full rounded-full bg-blue-700 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-800"
+        >
+          Simpan Perubahan
+        </button>
+      </form>
+
+      <form action={deleteById} className="mt-2">
+        <button
+          type="submit"
+          className="w-full rounded-full bg-red-50 px-4 py-2 text-xs font-bold text-red-600 ring-1 ring-red-200 transition hover:bg-red-100"
+        >
+          Hapus
+        </button>
+      </form>
+    </div>
   );
 }

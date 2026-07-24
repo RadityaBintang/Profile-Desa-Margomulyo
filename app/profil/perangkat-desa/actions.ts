@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
@@ -42,9 +43,39 @@ async function saveFotoPerangkat(file: File | null) {
   return `/uploads/perangkat/${fileName}`;
 }
 
-export async function updatePerangkatDesa(id: number, formData: FormData) {
+export async function createPerangkatDesa(formData: FormData) {
+  await requireAdmin();
+
   const nama = String(formData.get("nama") || "").trim();
   const jabatan = String(formData.get("jabatan") || "").trim();
+  const urutan = Number(formData.get("urutan") || 0);
+  const file = formData.get("foto") as File | null;
+
+  if (!nama || !jabatan) {
+    throw new Error("Nama dan jabatan wajib diisi.");
+  }
+
+  const foto = await saveFotoPerangkat(file);
+
+  await prisma.perangkatDesa.create({
+    data: {
+      nama,
+      jabatan,
+      foto: foto || null,
+      urutan,
+      status: "aktif",
+    },
+  });
+
+  revalidatePath("/profil/perangkat-desa");
+}
+
+export async function updatePerangkatDesa(id: number, formData: FormData) {
+  await requireAdmin();
+
+  const nama = String(formData.get("nama") || "").trim();
+  const jabatan = String(formData.get("jabatan") || "").trim();
+  const urutan = Number(formData.get("urutan") || 0);
   const fotoLama = String(formData.get("foto_lama") || "");
   const file = formData.get("foto") as File | null;
 
@@ -53,7 +84,7 @@ export async function updatePerangkatDesa(id: number, formData: FormData) {
   }
 
   const fotoBaru = await saveFotoPerangkat(file);
-  const fotoFinal = fotoBaru || fotoLama;
+  const fotoFinal = fotoBaru || fotoLama || null;
 
   await prisma.perangkatDesa.update({
     where: {
@@ -62,9 +93,23 @@ export async function updatePerangkatDesa(id: number, formData: FormData) {
     data: {
       nama,
       jabatan,
+      urutan,
       foto: fotoFinal,
+      status: "aktif",
     },
   });
 
   revalidatePath("/profil/perangkat-desa");
 }
+
+export async function deletePerangkatDesa(id: number) {
+  await requireAdmin();
+
+  await prisma.perangkatDesa.delete({
+    where: {
+      id,
+    },
+  });
+
+  revalidatePath("/profil/perangkat-desa");
+} 
