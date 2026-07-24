@@ -45,6 +45,7 @@ function readLayananForm(formData: FormData) {
   const kategori = String(formData.get("kategori") || "").trim();
   const deskripsi = String(formData.get("deskripsi") || "").trim() || null;
   const persyaratan = String(formData.get("persyaratan") || "").trim() || null;
+  const whatsapp = String(formData.get("whatsapp") || "").trim() || null;
   const tampilanBesar = formData.get("tampilanBesar") === "on";
   const urutan = Number(formData.get("urutan") || 0);
 

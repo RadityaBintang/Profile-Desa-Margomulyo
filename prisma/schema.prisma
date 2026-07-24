@@ -142,6 +142,7 @@ model LayananDesa {
   persyaratan   String?
   ikon          String?      @db.VarChar(255)
   tampilanBesar Boolean      @default(false) @map("tampilan_besar")
+  whatsapp      String?      @db.VarChar(30)
   urutan        Int          @default(0)
   status        StatusAktif? @default(aktif)
   createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)

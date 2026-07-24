@@ -11,6 +11,7 @@ export type LayananFormDefaults = {
   kategori?: string;
   deskripsi?: string | null;
   persyaratan?: string | null;
+  whatsapp?: string | null;
   ikon?: string | null;
   tampilanBesar?: boolean;
   urutan?: number;
@@ -112,6 +113,23 @@ export function LayananForm({
         />
       </div>
 
+      <div>
+        <label className="text-sm font-bold text-slate-700">
+          Nomor WhatsApp Layanan
+        </label>
+
+        <input
+          type="text"
+          name="whatsapp"
+          placeholder="Contoh: 081234567890"
+          className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
+        />
+
+        <p className="mt-1 text-xs text-slate-500">
+          Kosongkan jika ingin memakai WA Center default.
+        </p>
+      </div>
+      
       <div>
         <label className="mb-1.5 block text-sm font-bold text-slate-900">Logo / Gambar</label>
         <p className="mb-1.5 text-xs text-slate-500">

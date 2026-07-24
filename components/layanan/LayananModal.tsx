@@ -19,21 +19,32 @@ const waCenter: { wilayah: string; nomor: string; cakupan: string }[] = [
   {
     wilayah: "Wilayah Timur",
     nomor: "0895-3332-22228",
-    cakupan: "Selorejo, Wlingi, Kesamben, Doko, Gandungsari, Binangun, Wates, Selopuro",
+    cakupan:
+      "Selorejo, Wlingi, Kesamben, Doko, Gandungsari, Binangun, Wates, Selopuro",
   },
 ];
 
+function formatWhatsappLink(number?: string | null) {
+  if (!number) return "#";
+
+  const cleaned = number.replace(/\D/g, "");
+
+  if (cleaned.startsWith("0")) {
+    return `https://wa.me/62${cleaned.slice(1)}`;
+  }
+
+  if (cleaned.startsWith("62")) {
+    return `https://wa.me/${cleaned}`;
+  }
+
+  return `https://wa.me/${cleaned}`;
+}
+
 type PersyaratanGroup = {
-  /** null = daftar rata tanpa sub-judul */
   header: string | null;
   items: string[];
 };
 
-/**
- * Baris yang diakhiri tanda titik dua (":") dianggap sub-judul baru.
- * Baris "Catatan:" dikasih gaya kotak highlight khusus.
- * Ini murni logika tampilan — tidak butuh perubahan di form/database.
- */
 function parsePersyaratan(text: string | null): PersyaratanGroup[] {
   const lines = (text || "")
     .split("\n")
@@ -54,12 +65,19 @@ function parsePersyaratan(text: string | null): PersyaratanGroup[] {
       currentHasContent = true;
     }
   }
+
   if (currentHasContent) groups.push(current);
 
   return groups;
 }
 
-export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: () => void }) {
+export function LayananModal({
+  item,
+  onClose,
+}: {
+  item: LayananDesa;
+  onClose: () => void;
+}) {
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -76,6 +94,9 @@ export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: ()
 
   const groups = parsePersyaratan(item.persyaratan);
 
+  const nomorWaKhusus = item.whatsapp;
+  const linkWaKhusus = formatWhatsappLink(nomorWaKhusus);
+
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4"
@@ -90,8 +111,11 @@ export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: ()
             <p className="text-xs font-bold uppercase tracking-wide text-blue-600">
               Persyaratan
             </p>
-            <h3 className="mt-1 text-xl font-black text-slate-900">{item.namaLayanan}</h3>
+            <h3 className="mt-1 text-xl font-black text-slate-900">
+              {item.namaLayanan}
+            </h3>
           </div>
+
           <button
             type="button"
             onClick={onClose}
@@ -120,7 +144,9 @@ export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: ()
                 );
               }
 
-              const isCatatan = group.header.toLowerCase().startsWith("catatan");
+              const isCatatan = group.header
+                .toLowerCase()
+                .startsWith("catatan");
 
               if (isCatatan) {
                 return (
@@ -148,16 +174,46 @@ export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: ()
             })
           )}
 
+          {nomorWaKhusus && (
+            <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
+              <p className="text-xs font-bold uppercase text-green-700">
+                Nomor WhatsApp Layanan Ini
+              </p>
+
+              <a
+                href={linkWaKhusus}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-green-700 hover:underline"
+              >
+                <Phone size={16} />
+                {nomorWaKhusus}
+              </a>
+
+              <p className="mt-1 text-xs text-green-700">
+                Gunakan nomor ini untuk menghubungi layanan terkait secara
+                langsung.
+              </p>
+            </div>
+          )}
+
           <div className="rounded-2xl border border-slate-200 p-4">
-            <p className="font-bold text-slate-900">Kesulitan? Hubungi WA Center</p>
+            <p className="font-bold text-slate-900">
+              Kesulitan? Hubungi WA Center
+            </p>
+
             <div className="mt-3 space-y-3">
               {waCenter.map((wa) => {
                 const isMargomulyo = wa.wilayah === "Wilayah Tengah";
+                const waLink = formatWhatsappLink(wa.nomor);
+
                 return (
                   <div
                     key={wa.wilayah}
                     className={`rounded-xl p-3 ${
-                      isMargomulyo ? "bg-blue-50 ring-1 ring-blue-200" : "bg-slate-50"
+                      isMargomulyo
+                        ? "bg-blue-50 ring-1 ring-blue-200"
+                        : "bg-slate-50"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -169,8 +225,9 @@ export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: ()
                           </span>
                         )}
                       </p>
+
                       <a
-                        href={`https://wa.me/62${wa.nomor.replace(/-/g, "").replace(/^0/, "")}`}
+                        href={waLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex shrink-0 items-center gap-1.5 text-sm font-bold text-blue-600 hover:underline"
@@ -179,6 +236,7 @@ export function LayananModal({ item, onClose }: { item: LayananDesa; onClose: ()
                         {wa.nomor}
                       </a>
                     </div>
+
                     <p className="mt-1 text-xs text-slate-500">{wa.cakupan}</p>
                   </div>
                 );
