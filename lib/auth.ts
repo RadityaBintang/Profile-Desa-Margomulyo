@@ -6,27 +6,6 @@ import { SignJWT, jwtVerify } from "jose";
 const SESSION_COOKIE_NAME = "admin_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 8; // 8 jam
 
-function getSecretKey(): Uint8Array {
-  const secret =
-    process.env.ADMIN_AUTH_SECRET?.trim() ||
-    process.env.AUTH_SECRET?.trim();
-
-  if (!secret) {
-    throw new Error(
-      `ADMIN_AUTH_SECRET tidak ditemukan pada environment ${
-        process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown"
-      }.`
-    );
-  }
-
-  if (secret.length < 32) {
-    throw new Error(
-      "ADMIN_AUTH_SECRET minimal harus berisi 32 karakter."
-    );
-  }
-
-  return new TextEncoder().encode(secret);
-}
 export type AdminSession = {
   adminId: number;
   username: string;
@@ -34,67 +13,149 @@ export type AdminSession = {
   role: "admin";
 };
 
-/**
- * Membuat session JWT dan menyimpannya sebagai httpOnly cookie.
- * Dipanggil setelah kredensial admin berhasil diverifikasi.
- */
-export async function createAdminSession(payload: AdminSession) {
-  const expiresAt = new Date(Date.now() + SESSION_DURATION_SECONDS * 1000);
+function getSecretKey(): Uint8Array {
+  const secret = process.env.AUTH_SECRET?.trim();
 
-  const token = await new SignJWT(payload)
+  if (!secret) {
+    throw new Error(
+      `AUTH_SECRET tidak tersedia pada environment ${
+        process.env.VERCEL_ENV ??
+        process.env.NODE_ENV ??
+        "unknown"
+      }.`
+    );
+  }
+
+  if (secret.length < 32) {
+    throw new Error(
+      "AUTH_SECRET harus memiliki minimal 32 karakter."
+    );
+  }
+
+  return new TextEncoder().encode(secret);
+}
+
+/**
+ * Membuat JWT session dan menyimpannya ke cookie.
+ * Fungsi ini harus dipanggil dari Server Action atau Route Handler.
+ */
+export async function createAdminSession(
+  payload: AdminSession
+): Promise<void> {
+  const expiresAt = new Date(
+    Date.now() + SESSION_DURATION_SECONDS * 1000
+  );
+
+  const expiresAtSeconds = Math.floor(
+    expiresAt.getTime() / 1000
+  );
+
+  const token = await new SignJWT({
+    adminId: payload.adminId,
+    username: payload.username,
+    nama: payload.nama,
+    role: payload.role,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(expiresAt)
+    .setExpirationTime(expiresAtSeconds)
     .sign(getSecretKey());
 
   const cookieStore = await cookies();
+
   cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    expires: expiresAt,
     path: "/",
+    expires: expiresAt,
   });
 }
 
 /**
- * Membaca dan memverifikasi session dari cookie.
- * Mengembalikan null jika tidak ada session atau token tidak valid/kedaluwarsa.
+ * Membaca dan memverifikasi session admin.
  */
-export async function getAdminSession(): Promise<AdminSession | null> {
+export async function getAdminSession():
+  Promise<AdminSession | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const token = cookieStore.get(
+    SESSION_COOKIE_NAME
+  )?.value;
 
   if (!token) {
     return null;
   }
 
+  // Diletakkan di luar try agar error konfigurasi AUTH_SECRET
+  // tidak disembunyikan sebagai session null.
+  const secretKey = getSecretKey();
+
   try {
-    const { payload } = await jwtVerify(token, getSecretKey());
-    return payload as unknown as AdminSession;
-  } catch {
+    const { payload } = await jwtVerify(
+      token,
+      secretKey,
+      {
+        algorithms: ["HS256"],
+      }
+    );
+
+    if (
+      typeof payload.adminId !== "number" ||
+      typeof payload.username !== "string" ||
+      payload.role !== "admin"
+    ) {
+      return null;
+    }
+
+    return {
+      adminId: payload.adminId,
+      username: payload.username,
+      nama:
+        typeof payload.nama === "string"
+          ? payload.nama
+          : null,
+      role: "admin",
+    };
+  } catch (error) {
+    console.error(
+      "Session admin tidak valid:",
+      error instanceof Error
+        ? error.message
+        : "Error tidak diketahui"
+    );
+
     return null;
   }
 }
 
 /**
- * Menghapus session (logout).
+ * Menghapus session admin.
+ * Fungsi ini harus dipanggil dari Server Action atau Route Handler.
  */
-export async function destroyAdminSession() {
+export async function destroyAdminSession():
+  Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+
+  cookieStore.set(SESSION_COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 /**
- * Guard untuk dipanggil di awal setiap Server Action yang hanya boleh
- * diakses admin. Lempar error jika belum login, sehingga aksi dibatalkan
- * meskipun request langsung menyasar action (bukan lewat halaman).
+ * Memastikan pengguna sudah login sebagai admin.
  */
-export async function requireAdmin(): Promise<AdminSession> {
+export async function requireAdmin():
+  Promise<AdminSession> {
   const session = await getAdminSession();
 
   if (!session || session.role !== "admin") {
-    throw new Error("UNAUTHORIZED: Anda harus login sebagai admin untuk melakukan aksi ini.");
+    throw new Error(
+      "UNAUTHORIZED: Anda harus login sebagai admin untuk melakukan aksi ini."
+    );
   }
 
   return session;
