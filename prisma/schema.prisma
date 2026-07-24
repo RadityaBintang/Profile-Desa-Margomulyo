@@ -135,18 +135,18 @@ model ProdukHukum {
 }
 
 model LayananDesa {
-  id            Int          @id @default(autoincrement())
-  namaLayanan   String       @map("nama_layanan") @db.VarChar(150)
-  kategori      String       @default("Umum") @db.VarChar(100)
-  deskripsi     String?
-  persyaratan   String?
-  ikon          String?      @db.VarChar(255)
-  tampilanBesar Boolean      @default(false) @map("tampilan_besar")
-  whatsapp      String?      @db.VarChar(30)
-  urutan        Int          @default(0)
-  status        StatusAktif? @default(aktif)
-  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id             Int          @id @default(autoincrement())
+  namaLayanan    String       @map("nama_layanan") @db.VarChar(150)
+  kategori       String       @default("Umum") @db.VarChar(100)
+  deskripsi      String?
+  persyaratan    String?
+  whatsapp       String?      @db.VarChar(30)
+  ikon           String?      @db.VarChar(255)
+  tampilanBesar  Boolean      @default(false) @map("tampilan_besar")
+  urutan         Int          @default(0)
+  status         StatusAktif? @default(aktif)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("layanan_desa")
 }

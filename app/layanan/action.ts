@@ -53,7 +53,7 @@ function readLayananForm(formData: FormData) {
     throw new Error("Nama layanan dan kategori wajib diisi.");
   }
 
-  return { namaLayanan, kategori, deskripsi, persyaratan, tampilanBesar, urutan };
+  return { namaLayanan, kategori, deskripsi, persyaratan, whatsapp, tampilanBesar, urutan };
 }
 
 export async function createLayanan(formData: FormData) {

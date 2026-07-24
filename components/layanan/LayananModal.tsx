@@ -4,6 +4,10 @@ import { useEffect } from "react";
 import { Phone, X } from "lucide-react";
 import type { LayananDesa } from "@prisma/client";
 
+type LayananModalItem = LayananDesa & {
+  whatsapp?: string | null;
+};
+
 const waCenter: { wilayah: string; nomor: string; cakupan: string }[] = [
   {
     wilayah: "Wilayah Barat",
