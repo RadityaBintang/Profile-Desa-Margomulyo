@@ -79,7 +79,7 @@ export function LayananModal({
   item,
   onClose,
 }: {
-  item: LayananDesa;
+  item: LayananModalItem;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -100,6 +100,16 @@ export function LayananModal({
 
   const nomorWaKhusus = item.whatsapp;
   const linkWaKhusus = formatWhatsappLink(nomorWaKhusus);
+  const effectiveWaCenter = waCenter.map((wa) => {
+  if (wa.wilayah === "Wilayah Tengah" && nomorWaKhusus) {
+    return {
+      ...wa,
+      nomor: nomorWaKhusus,
+    };
+  }
+
+  return wa;
+});
 
   return (
     <div
@@ -207,7 +217,7 @@ export function LayananModal({
             </p>
 
             <div className="mt-3 space-y-3">
-              {waCenter.map((wa) => {
+              {effectiveWaCenter.map((wa) => {
                 const isMargomulyo = wa.wilayah === "Wilayah Tengah";
                 const waLink = formatWhatsappLink(wa.nomor);
 
