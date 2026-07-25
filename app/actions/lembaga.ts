@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import {
@@ -325,6 +324,102 @@ export async function updateLembaga(
 
   revalidateLembagaPages();
   redirect(returnPath);
+}
+
+
+/**
+ * Memperbarui ikon/gambar lembaga langsung dari kartu
+ * KelembagaanSection di halaman beranda.
+ */
+export async function updateIkonLembaga(
+  id: number,
+  formData: FormData
+): Promise<void> {
+  await requireAdmin();
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(
+      "ID lembaga tidak valid."
+    );
+  }
+
+  const fileValue =
+    formData.get("ikon") ??
+    formData.get("gambar") ??
+    formData.get("foto");
+
+  const file =
+    fileValue instanceof File &&
+    fileValue.size > 0
+      ? fileValue
+      : null;
+
+  if (!file) {
+    throw new Error(
+      "File gambar lembaga belum dipilih."
+    );
+  }
+
+  const lembagaLama =
+    await prisma.lembagaDesa.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        ikon: true,
+      },
+    });
+
+  if (!lembagaLama) {
+    throw new Error(
+      "Data lembaga tidak ditemukan."
+    );
+  }
+
+  const uploadedImage =
+    await uploadImageToStorage(file, {
+      folder: "lembaga",
+      filePrefix: `ikon-lembaga-${id}`,
+      maxSizeBytes: MAX_IMAGE_SIZE,
+      required: true,
+    });
+
+  if (!uploadedImage) {
+    throw new Error(
+      "Gambar lembaga gagal diunggah."
+    );
+  }
+
+  try {
+    await prisma.lembagaDesa.update({
+      where: {
+        id,
+      },
+      data: {
+        ikon: uploadedImage.publicUrl,
+      },
+    });
+  } catch (databaseError) {
+    await deleteImageFromStorage(
+      uploadedImage.publicUrl
+    );
+
+    console.error(
+      "Gagal memperbarui ikon lembaga:",
+      databaseError
+    );
+
+    throw new Error(
+      "Ikon lembaga gagal disimpan ke database."
+    );
+  }
+
+  await deleteImageFromStorage(
+    lembagaLama.ikon
+  );
+
+  revalidateLembagaPages();
 }
 
 export async function deleteLembaga(
