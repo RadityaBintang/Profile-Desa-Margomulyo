@@ -149,6 +149,8 @@ export function StrukturOrganisasiUpload({
         "Struktur organisasi berhasil diperbarui."
       );
 
+      clearObjectUrl();
+
       router.refresh();
     } catch (uploadError) {
       console.error(
@@ -174,114 +176,127 @@ export function StrukturOrganisasiUpload({
   }
 
   return (
-    <form
-      ref={formRef}
-      action={handleSubmit}
-      className="
-        overflow-hidden rounded-3xl
-        border border-blue-100
-        bg-white shadow-lg
-      "
-    >
-      {/* Container gambar */}
-      <div className="relative min-h-[420px] bg-blue-50">
-        {preview ? (
-          <img
-            src={preview}
-            alt="Struktur Organisasi Desa"
-            className="
-              block min-h-[420px] w-full
-              object-contain p-6
-            "
-          />
-        ) : (
-          <div
-            className="
-              flex min-h-[420px]
-              flex-col items-center
-              justify-center p-8
-              text-center
-            "
-          >
+    <div className="w-full">
+      {/* Form dan container gambar */}
+      <form
+        ref={formRef}
+        action={handleSubmit}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          name="strukturOrganisasi"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={handleFileChange}
+          disabled={isUploading}
+        />
+
+        <div
+          className="
+            relative min-h-[420px]
+            overflow-hidden rounded-3xl
+            border border-blue-100
+            bg-blue-50 shadow-lg
+          "
+        >
+          {preview ? (
+            <img
+              src={preview}
+              alt="Struktur Organisasi Desa"
+              className="
+                block min-h-[420px]
+                w-full object-contain p-6
+              "
+            />
+          ) : (
             <div
               className="
-                flex h-20 w-20
-                items-center justify-center
-                rounded-full bg-blue-100
-                text-blue-700
-              "
-            >
-              <Upload size={38} />
-            </div>
-
-            <h3
-              className="
-                mt-5 text-2xl
-                font-black text-blue-950
-              "
-            >
-              Struktur Organisasi Desa
-            </h3>
-
-            <p
-              className="
-                mt-2 max-w-md
-                text-sm leading-6
-                text-slate-500
-              "
-            >
-              Gambar struktur organisasi belum
-              tersedia.
-            </p>
-          </div>
-        )}
-
-        {isUploading && (
-          <div
-            className="
-              absolute inset-0 z-10
-              flex items-center
-              justify-center
-              bg-slate-950/45
-              backdrop-blur-[2px]
-            "
-          >
-            <div
-              className="
-                flex flex-col
-                items-center rounded-2xl
-                bg-white px-7 py-5
-                shadow-xl
+                flex min-h-[420px]
+                flex-col items-center
+                justify-center p-8
+                text-center
               "
             >
               <div
                 className="
-                  h-9 w-9 animate-spin
-                  rounded-full border-4
-                  border-blue-100
-                  border-t-blue-700
+                  flex h-20 w-20
+                  items-center justify-center
+                  rounded-full bg-blue-100
+                  text-blue-700
                 "
-              />
+              >
+                <Upload size={38} />
+              </div>
+
+              <h3
+                className="
+                  mt-5 text-2xl
+                  font-black text-blue-950
+                "
+              >
+                Struktur Organisasi Desa
+              </h3>
 
               <p
                 className="
-                  mt-3 text-sm
-                  font-bold text-blue-950
+                  mt-2 max-w-md
+                  text-sm leading-6
+                  text-slate-500
                 "
               >
-                Mengunggah gambar...
+                Gambar struktur organisasi belum
+                tersedia.
               </p>
             </div>
-          </div>
-        )}
-      </div>
+          )}
 
-      {/* Pesan error */}
+          {isUploading && (
+            <div
+              className="
+                absolute inset-0 z-10
+                flex items-center
+                justify-center
+                bg-slate-950/45
+                backdrop-blur-[2px]
+              "
+            >
+              <div
+                className="
+                  flex flex-col items-center
+                  rounded-2xl bg-white
+                  px-7 py-5 shadow-xl
+                "
+              >
+                <div
+                  className="
+                    h-9 w-9 animate-spin
+                    rounded-full border-4
+                    border-blue-100
+                    border-t-blue-700
+                  "
+                />
+
+                <p
+                  className="
+                    mt-3 text-sm
+                    font-bold text-blue-950
+                  "
+                >
+                  Mengunggah gambar...
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </form>
+
+      {/* Pesan berada di luar container gambar */}
       {error && (
         <div
           className="
-            flex items-start gap-2
-            border-t border-red-200
+            mt-4 flex items-start gap-2
+            rounded-xl border border-red-200
             bg-red-50 px-5 py-4
             text-sm font-semibold
             text-red-700
@@ -296,12 +311,12 @@ export function StrukturOrganisasiUpload({
         </div>
       )}
 
-      {/* Pesan berhasil */}
       {success && !error && (
         <div
           className="
-            flex items-start gap-2
-            border-t border-emerald-200
+            mt-4 flex items-start gap-2
+            rounded-xl border
+            border-emerald-200
             bg-emerald-50 px-5 py-4
             text-sm font-semibold
             text-emerald-700
@@ -316,25 +331,9 @@ export function StrukturOrganisasiUpload({
         </div>
       )}
 
-      {/* Tombol berada di bawah container gambar */}
+      {/* Tombol benar-benar di luar container gambar */}
       {isAdmin && (
-        <div
-          className="
-            flex justify-center
-            border-t border-blue-100
-            bg-white px-6 py-5
-          "
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            name="strukturOrganisasi"
-            accept="image/jpeg,image/png,image/webp"
-            className="hidden"
-            onChange={handleFileChange}
-            disabled={isUploading}
-          />
-
+        <div className="mt-5 flex justify-center">
           <button
             type="button"
             onClick={handleUploadClick}
@@ -343,7 +342,7 @@ export function StrukturOrganisasiUpload({
               inline-flex min-h-12
               items-center justify-center
               gap-2 rounded-xl
-              bg-blue-700 px-7 py-3
+              bg-blue-700 px-8 py-3
               text-sm font-bold
               text-white shadow-md
               transition
@@ -367,6 +366,6 @@ export function StrukturOrganisasiUpload({
           </button>
         </div>
       )}
-    </form>
+    </div>
   );
 }
