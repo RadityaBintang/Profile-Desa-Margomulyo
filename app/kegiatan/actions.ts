@@ -52,7 +52,7 @@ async function saveImage(
 
   if (file.size > MAX_IMAGE_SIZE) {
     throw new Error(
-      "Ukuran gambar maksimal 2 MB."
+      "Ukuran gambar maksimal 5 MB."
     );
   }
 

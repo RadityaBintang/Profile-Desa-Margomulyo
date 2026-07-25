@@ -72,7 +72,7 @@ export default async function TambahKegiatanPage() {
               <label htmlFor="gambar">Foto Kegiatan</label>
               <div className="activity-upload-box">
                 <input id="gambar" name="gambar" type="file" accept="image/jpeg,image/png,image/webp" />
-                <small>Format JPG, PNG, atau WebP. Maksimal 2MB.</small>
+                <small>Format JPG, PNG, atau WebP. Maksimal 5MB.</small>
               </div>
             </div>
 

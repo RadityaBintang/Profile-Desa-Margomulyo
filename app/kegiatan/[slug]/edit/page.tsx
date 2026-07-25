@@ -148,7 +148,7 @@ export default async function EditKegiatanPage({
                 <input id="gambar" name="gambar" type="file" accept="image/*" />
                 <small>
                   Kosongkan jika tidak ingin mengganti gambar. Format JPG, PNG,
-                  atau WebP. Maksimal 2MB.
+                  atau WebP. Maksimal 5MB.
                 </small>
               </div>
             </div>
