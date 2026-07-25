@@ -1562,4 +1562,170 @@ h3,
   .produk-hukum-popup h3 {
     font-size: 24px;
   }
+
+  .kegiatan-card-detail-link,
+.kegiatan-title-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.kegiatan-title-link h2 {
+  transition: color 0.2s ease;
+}
+
+.kegiatan-title-link:hover h2 {
+  color: var(--blue-main);
+}
+
+.kegiatan-card-description {
+  display: -webkit-box;
+  min-height: 58px;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.kegiatan-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #64748b;
+}
+
+.kegiatan-location svg {
+  flex-shrink: 0;
+  color: var(--blue-main);
+}
+
+.kegiatan-card-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.kegiatan-admin-actions {
+  display: flex;
+  flex: 1.3;
+  gap: 10px;
+}
+
+.kegiatan-action-button,
+.kegiatan-delete-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.kegiatan-action-button:hover,
+.kegiatan-delete-button:hover {
+  transform: translateY(-2px);
+}
+
+.kegiatan-detail-button {
+  flex: 1;
+  border: 1px solid var(--blue-main);
+  background: #ffffff;
+  color: var(--blue-main);
+}
+
+.kegiatan-detail-button:hover {
+  border-color: #174bd8;
+  background: var(--blue-soft);
+  color: #174bd8;
+  box-shadow: 0 8px 18px rgba(30, 91, 255, 0.15);
+}
+
+.kegiatan-edit-button {
+  flex: 1;
+  border: 1px solid #f59e0b;
+  background: #fff8e8;
+  color: #b45309;
+}
+
+.kegiatan-edit-button:hover {
+  border-color: #d97706;
+  background: #f59e0b;
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(245, 158, 11, 0.2);
+}
+
+.kegiatan-delete-wrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.kegiatan-delete-button {
+  width: 100%;
+  flex: 1;
+  border: 1px solid #dc2626;
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.kegiatan-delete-button:hover {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.2);
+}
+
+.kegiatan-delete-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+}
+
+.kegiatan-delete-error {
+  margin: 7px 0 0;
+  color: #dc2626;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.kegiatan-admin-add-button {
+  gap: 7px;
+}
+
+@media (max-width: 760px) {
+  .kegiatan-card-actions {
+    flex-direction: column;
+  }
+
+  .kegiatan-admin-actions {
+    width: 100%;
+  }
+
+  .kegiatan-action-button,
+  .kegiatan-delete-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .kegiatan-admin-actions {
+    flex-direction: column;
+  }
+}
 }

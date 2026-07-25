@@ -1,4 +1,10 @@
 import Link from "next/link";
+import {
+  Eye,
+  MapPin,
+  Pencil,
+  Plus,
+} from "lucide-react";
 
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/auth";
@@ -38,7 +44,7 @@ export default async function KegiatanPage() {
   const [kegiatan, session] = await Promise.all([
     prisma.kegiatan.findMany({
       where: {
-        status: "publish" as never,
+        status: "publish" as any,
       },
       orderBy: {
         tanggal: "desc",
@@ -63,7 +69,8 @@ export default async function KegiatanPage() {
               href="/kegiatan/tambah"
               className="kegiatan-admin-add-button"
             >
-              + Tambah Kegiatan
+              <Plus size={17} strokeWidth={2.5} />
+              <span>Tambah Kegiatan</span>
             </Link>
           )}
         </section>
@@ -72,6 +79,7 @@ export default async function KegiatanPage() {
           <div className="kegiatan-card-grid">
             {kegiatan.map((activity) => {
               const date = getDateParts(activity.tanggal);
+
               const activitySlug =
                 activity.slug || String(activity.id);
 
@@ -83,6 +91,7 @@ export default async function KegiatanPage() {
                   <Link
                     href={`/kegiatan/${activitySlug}`}
                     className="kegiatan-card-detail-link"
+                    aria-label={`Buka detail ${activity.judul}`}
                   >
                     <div className="kegiatan-image-wrapper">
                       <img
@@ -118,13 +127,13 @@ export default async function KegiatanPage() {
                       <h2>{activity.judul}</h2>
                     </Link>
 
-                    <p>
+                    <p className="kegiatan-card-description">
                       {activity.ringkasan ||
                         "Warga bergotong royong mendukung program pembangunan dan kebersamaan desa."}
                     </p>
 
                     <div className="kegiatan-location">
-                      <span>▣</span>
+                      <MapPin size={16} strokeWidth={2} />
 
                       <span>
                         {activity.lokasi ||
@@ -135,18 +144,24 @@ export default async function KegiatanPage() {
                     <div className="kegiatan-card-actions">
                       <Link
                         href={`/kegiatan/${activitySlug}`}
-                        className="kegiatan-detail-button"
+                        className="kegiatan-action-button kegiatan-detail-button"
                       >
-                        Lihat Detail
+                        <Eye size={17} strokeWidth={2.2} />
+                        <span>Lihat Detail</span>
                       </Link>
 
                       {isAdmin && (
                         <div className="kegiatan-admin-actions">
                           <Link
                             href={`/kegiatan/edit?id=${activity.id}`}
-                            className="kegiatan-edit-button"
+                            className="kegiatan-action-button kegiatan-edit-button"
                           >
-                            Edit
+                            <Pencil
+                              size={16}
+                              strokeWidth={2.2}
+                            />
+
+                            <span>Edit</span>
                           </Link>
 
                           <DeleteKegiatanButton
