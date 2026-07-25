@@ -29,7 +29,7 @@ export default async function TambahKegiatanPage() {
         </div>
 
         <div className="activity-form-card">
-          <form action={createPublicKegiatan} className="activity-form">
+          <form action={createPublicKegiatan} encType="multipart/form-data" className="activity-form">
             <div className="activity-input-group">
               <label htmlFor="judul">Judul Kegiatan</label>
               <input
@@ -71,7 +71,7 @@ export default async function TambahKegiatanPage() {
             <div className="activity-input-group">
               <label htmlFor="gambar">Foto Kegiatan</label>
               <div className="activity-upload-box">
-                <input id="gambar" name="gambar" type="file" accept="image/*" />
+                <input id="gambar" name="gambar" type="file" accept="image/jpeg,image/png,image/webp" />
                 <small>Format JPG, PNG, atau WebP. Maksimal 2MB.</small>
               </div>
             </div>

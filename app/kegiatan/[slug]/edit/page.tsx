@@ -63,7 +63,7 @@ export default async function EditKegiatanPage({
         </div>
 
         <div className="activity-form-card">
-          <form action={updateKegiatanById} className="activity-form">
+          <form action={updateKegiatanById} encType="multipart/form-data" className="activity-form">
             <input
               type="hidden"
               name="gambar_lama"
