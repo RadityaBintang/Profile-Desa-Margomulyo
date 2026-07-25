@@ -18,6 +18,16 @@ const ALLOWED_IMAGE_TYPES: Record<string, string> = {
   "image/webp": "webp",
 };
 
+type UploadedImage = {
+  publicUrl: string;
+  storagePath: string;
+};
+
+export type DeleteKegiatanResult = {
+  success: boolean;
+  message: string;
+};
+
 function createSlug(text: string): string {
   const slug = text
     .toLowerCase()
@@ -29,11 +39,6 @@ function createSlug(text: string): string {
 
   return slug || `kegiatan-${Date.now()}`;
 }
-
-type UploadedImage = {
-  publicUrl: string;
-  storagePath: string;
-};
 
 async function saveImage(
   file: File | null
@@ -106,7 +111,7 @@ async function saveImage(
 
 /**
  * Mengambil object path dari URL publik Supabase.
- * URL lokal lama seperti /uploads/... otomatis dilewati.
+ * Gambar lama seperti /uploads/... tidak akan diproses.
  */
 function getStoragePathFromPublicUrl(
   publicUrl: string
@@ -135,6 +140,10 @@ function getStoragePathFromPublicUrl(
   }
 }
 
+/**
+ * Menghapus file gambar dari Supabase Storage.
+ * Kegagalan menghapus file tidak membatalkan perubahan database.
+ */
 async function deleteStoredImage(
   publicUrl: string
 ): Promise<void> {
@@ -152,9 +161,8 @@ async function deleteStoredImage(
     .remove([storagePath]);
 
   if (error) {
-    // Tidak menggagalkan operasi database.
     console.error(
-      "Gagal menghapus gambar dari Storage:",
+      "Gagal menghapus gambar dari Supabase Storage:",
       error.message
     );
   }
@@ -190,8 +198,11 @@ export async function createPublicKegiatan(
   ).trim();
 
   const fileValue = formData.get("gambar");
+
   const file =
-    fileValue instanceof File ? fileValue : null;
+    fileValue instanceof File
+      ? fileValue
+      : null;
 
   if (!judul || !tanggal) {
     throw new Error(
@@ -213,11 +224,7 @@ export async function createPublicKegiatan(
     await prisma.kegiatan.create({
       data: {
         judul,
-
-        // Tambahkan timestamp agar slug tidak bentrok
-        // ketika terdapat judul kegiatan yang sama.
         slug: `${createSlug(judul)}-${Date.now()}`,
-
         tanggal: parsedTanggal,
         lokasi: lokasi || null,
         kategori: kategori || null,
@@ -228,8 +235,10 @@ export async function createPublicKegiatan(
       },
     });
   } catch (error) {
-    // Jika upload berhasil tetapi database gagal,
-    // hapus file agar tidak menjadi file yatim.
+    /*
+     * Apabila gambar berhasil diunggah tetapi data gagal
+     * disimpan, hapus gambar agar tidak menjadi file yatim.
+     */
     if (uploadedImage) {
       await deleteStoredImage(
         uploadedImage.publicUrl
@@ -286,8 +295,11 @@ export async function updatePublicKegiatan(
   ).trim();
 
   const fileValue = formData.get("gambar");
+
   const file =
-    fileValue instanceof File ? fileValue : null;
+    fileValue instanceof File
+      ? fileValue
+      : null;
 
   if (!judul || !tanggal) {
     throw new Error(
@@ -303,6 +315,23 @@ export async function updatePublicKegiatan(
     );
   }
 
+  const kegiatanLama =
+    await prisma.kegiatan.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        slug: true,
+        gambar: true,
+      },
+    });
+
+  if (!kegiatanLama) {
+    throw new Error(
+      "Kegiatan yang akan diperbarui tidak ditemukan."
+    );
+  }
+
   const uploadedImage = await saveImage(file);
 
   try {
@@ -312,7 +341,13 @@ export async function updatePublicKegiatan(
       },
       data: {
         judul,
-        slug: createSlug(judul),
+
+        /*
+         * ID ditambahkan agar slug tidak bertabrakan
+         * dengan kegiatan lain yang memiliki judul sama.
+         */
+        slug: `${createSlug(judul)}-${id}`,
+
         tanggal: parsedTanggal,
         lokasi: lokasi || null,
         kategori: kategori || null,
@@ -321,6 +356,7 @@ export async function updatePublicKegiatan(
         gambar:
           uploadedImage?.publicUrl ||
           gambarLama ||
+          kegiatanLama.gambar ||
           "",
         status: "publish",
       },
@@ -335,31 +371,49 @@ export async function updatePublicKegiatan(
     throw error;
   }
 
-  // Hapus gambar lama hanya setelah update DB berhasil.
+  /*
+   * Gambar lama baru dihapus setelah perubahan database
+   * berhasil disimpan.
+   */
+  const gambarSebelumnya =
+    gambarLama || kegiatanLama.gambar || "";
+
   if (
     uploadedImage &&
-    gambarLama &&
-    gambarLama !== uploadedImage.publicUrl
+    gambarSebelumnya &&
+    gambarSebelumnya !== uploadedImage.publicUrl
   ) {
-    await deleteStoredImage(gambarLama);
+    await deleteStoredImage(
+      gambarSebelumnya
+    );
   }
 
   revalidatePath("/");
   revalidatePath("/kegiatan");
-  revalidatePath(`/kegiatan/${id}`);
+  revalidatePath(
+    `/kegiatan/${kegiatanLama.slug}`
+  );
 
   redirect("/kegiatan");
 }
 
+/**
+ * Menghapus data kegiatan dari database dan menghapus
+ * gambarnya dari Supabase Storage.
+ *
+ * Fungsi mengembalikan hasil agar dapat dipanggil dari
+ * Client Component tanpa redirect.
+ */
 export async function deletePublicKegiatan(
   id: number
-): Promise<void> {
+): Promise<DeleteKegiatanResult> {
   await requireAdmin();
 
   if (!Number.isInteger(id) || id <= 0) {
-    throw new Error(
-      "ID kegiatan tidak valid."
-    );
+    return {
+      success: false,
+      message: "ID kegiatan tidak valid.",
+    };
   }
 
   const kegiatan =
@@ -368,28 +422,53 @@ export async function deletePublicKegiatan(
         id,
       },
       select: {
+        id: true,
+        judul: true,
+        slug: true,
         gambar: true,
       },
     });
 
   if (!kegiatan) {
-    throw new Error(
-      "Kegiatan tidak ditemukan."
-    );
+    return {
+      success: false,
+      message: "Kegiatan tidak ditemukan.",
+    };
   }
 
-  await prisma.kegiatan.delete({
-    where: {
-      id,
-    },
-  });
+  try {
+    await prisma.kegiatan.delete({
+      where: {
+        id: kegiatan.id,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Gagal menghapus kegiatan dari database:",
+      error
+    );
 
+    return {
+      success: false,
+      message:
+        "Kegiatan gagal dihapus dari database.",
+    };
+  }
+
+  /*
+   * Penghapusan gambar dilakukan setelah data berhasil
+   * dihapus. Error Storage tidak membatalkan penghapusan DB.
+   */
   if (kegiatan.gambar) {
     await deleteStoredImage(kegiatan.gambar);
   }
 
   revalidatePath("/");
   revalidatePath("/kegiatan");
+  revalidatePath(`/kegiatan/${kegiatan.slug}`);
 
-  redirect("/kegiatan");
+  return {
+    success: true,
+    message: `Kegiatan "${kegiatan.judul}" berhasil dihapus.`,
+  };
 }
