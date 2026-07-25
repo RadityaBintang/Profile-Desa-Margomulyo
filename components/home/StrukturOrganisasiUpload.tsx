@@ -54,17 +54,10 @@ export function StrukturOrganisasiUpload({
   const [success, setSuccess] =
     useState<string | null>(null);
 
-  /*
-   * Perbarui preview ketika URL gambar dari database
-   * berubah setelah router.refresh().
-   */
   useEffect(() => {
     setPreview(imageUrl || null);
   }, [imageUrl]);
 
-  /*
-   * Membersihkan temporary object URL dari browser.
-   */
   useEffect(() => {
     return () => {
       if (objectUrlRef.current) {
@@ -76,13 +69,15 @@ export function StrukturOrganisasiUpload({
   }, []);
 
   function clearObjectUrl() {
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(
-        objectUrlRef.current
-      );
-
-      objectUrlRef.current = null;
+    if (!objectUrlRef.current) {
+      return;
     }
+
+    URL.revokeObjectURL(
+      objectUrlRef.current
+    );
+
+    objectUrlRef.current = null;
   }
 
   function handleUploadClick() {
@@ -135,10 +130,6 @@ export function StrukturOrganisasiUpload({
 
     setPreview(previewUrl);
 
-    /*
-     * File sudah tersedia di dalam input,
-     * sehingga form dapat langsung dikirim.
-     */
     formRef.current?.requestSubmit();
   }
 
@@ -158,10 +149,6 @@ export function StrukturOrganisasiUpload({
         "Struktur organisasi berhasil diperbarui."
       );
 
-      /*
-       * Meminta Server Component mengambil URL
-       * terbaru dari database.
-       */
       router.refresh();
     } catch (uploadError) {
       console.error(
@@ -191,34 +178,37 @@ export function StrukturOrganisasiUpload({
       ref={formRef}
       action={handleSubmit}
       className="
-        relative overflow-hidden rounded-3xl
-        border border-blue-100 bg-white
-        shadow-lg
+        overflow-hidden rounded-3xl
+        border border-blue-100
+        bg-white shadow-lg
       "
     >
+      {/* Container gambar */}
       <div className="relative min-h-[420px] bg-blue-50">
         {preview ? (
           <img
             src={preview}
             alt="Struktur Organisasi Desa"
             className="
-              h-full min-h-[420px] w-full
+              block min-h-[420px] w-full
               object-contain p-6
             "
           />
         ) : (
           <div
             className="
-              flex min-h-[420px] flex-col
-              items-center justify-center
-              p-8 text-center
+              flex min-h-[420px]
+              flex-col items-center
+              justify-center p-8
+              text-center
             "
           >
             <div
               className="
-                flex h-20 w-20 items-center
-                justify-center rounded-full
-                bg-blue-100 text-blue-700
+                flex h-20 w-20
+                items-center justify-center
+                rounded-full bg-blue-100
+                text-blue-700
               "
             >
               <Upload size={38} />
@@ -226,8 +216,8 @@ export function StrukturOrganisasiUpload({
 
             <h3
               className="
-                mt-5 text-2xl font-black
-                text-blue-950
+                mt-5 text-2xl
+                font-black text-blue-950
               "
             >
               Struktur Organisasi Desa
@@ -235,8 +225,9 @@ export function StrukturOrganisasiUpload({
 
             <p
               className="
-                mt-2 max-w-md text-sm
-                leading-6 text-slate-500
+                mt-2 max-w-md
+                text-sm leading-6
+                text-slate-500
               "
             >
               Gambar struktur organisasi belum
@@ -249,15 +240,18 @@ export function StrukturOrganisasiUpload({
           <div
             className="
               absolute inset-0 z-10
-              flex items-center justify-center
-              bg-slate-950/45 backdrop-blur-[2px]
+              flex items-center
+              justify-center
+              bg-slate-950/45
+              backdrop-blur-[2px]
             "
           >
             <div
               className="
-                flex flex-col items-center
-                rounded-2xl bg-white
-                px-7 py-5 shadow-xl
+                flex flex-col
+                items-center rounded-2xl
+                bg-white px-7 py-5
+                shadow-xl
               "
             >
               <div
@@ -271,8 +265,8 @@ export function StrukturOrganisasiUpload({
 
               <p
                 className="
-                  mt-3 text-sm font-bold
-                  text-blue-950
+                  mt-3 text-sm
+                  font-bold text-blue-950
                 "
               >
                 Mengunggah gambar...
@@ -280,57 +274,9 @@ export function StrukturOrganisasiUpload({
             </div>
           </div>
         )}
-
-        {isAdmin && (
-          <>
-            <input
-              ref={inputRef}
-              type="file"
-              name="strukturOrganisasi"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={handleFileChange}
-              disabled={isUploading}
-            />
-
-            <div
-              className="
-                absolute inset-x-0 bottom-6
-                flex justify-center px-5
-              "
-            >
-              <button
-                type="button"
-                onClick={handleUploadClick}
-                disabled={isUploading}
-                className="
-                  inline-flex items-center
-                  justify-center gap-2
-                  rounded-full bg-blue-700
-                  px-7 py-3 text-sm
-                  font-bold text-white
-                  shadow-lg transition
-                  hover:-translate-y-0.5
-                  hover:bg-blue-800
-                  disabled:cursor-not-allowed
-                  disabled:opacity-70
-                "
-              >
-                <Upload size={17} />
-
-                <span>
-                  {isUploading
-                    ? "Mengunggah..."
-                    : preview
-                      ? "Ganti Struktur Organisasi"
-                      : "Upload Struktur Organisasi"}
-                </span>
-              </button>
-            </div>
-          </>
-        )}
       </div>
 
+      {/* Pesan error */}
       {error && (
         <div
           className="
@@ -350,6 +296,7 @@ export function StrukturOrganisasiUpload({
         </div>
       )}
 
+      {/* Pesan berhasil */}
       {success && !error && (
         <div
           className="
@@ -366,6 +313,58 @@ export function StrukturOrganisasiUpload({
           />
 
           <span>{success}</span>
+        </div>
+      )}
+
+      {/* Tombol berada di bawah container gambar */}
+      {isAdmin && (
+        <div
+          className="
+            flex justify-center
+            border-t border-blue-100
+            bg-white px-6 py-5
+          "
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            name="strukturOrganisasi"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={isUploading}
+          />
+
+          <button
+            type="button"
+            onClick={handleUploadClick}
+            disabled={isUploading}
+            className="
+              inline-flex min-h-12
+              items-center justify-center
+              gap-2 rounded-xl
+              bg-blue-700 px-7 py-3
+              text-sm font-bold
+              text-white shadow-md
+              transition
+              hover:-translate-y-0.5
+              hover:bg-blue-800
+              hover:shadow-lg
+              disabled:cursor-not-allowed
+              disabled:opacity-70
+              disabled:hover:translate-y-0
+            "
+          >
+            <Upload size={18} />
+
+            <span>
+              {isUploading
+                ? "Mengunggah..."
+                : preview
+                  ? "Ganti Struktur Organisasi"
+                  : "Upload Struktur Organisasi"}
+            </span>
+          </button>
         </div>
       )}
     </form>
