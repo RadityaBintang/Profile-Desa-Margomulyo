@@ -1,62 +1,371 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import { redirect } from "next/navigation";
+
+import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import {
+  deleteImageFromStorage,
+  uploadImageToStorage,
+} from "@/lib/supabase-storage";
 
-async function saveIkonLembaga(file: File | null) {
-  if (!file || file.size === 0) {
-    throw new Error("File gambar belum dipilih.");
+const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
+
+type StatusLembaga = "aktif" | "nonaktif";
+type ImageDatabaseField = "foto" | "ikon";
+
+type LembagaFormData = {
+  namaLembaga: string;
+  singkatan: string | null;
+  deskripsi: string | null;
+  ketua: string | null;
+  periode: string | null;
+  status: StatusLembaga;
+};
+
+type LembagaImageInput = {
+  file: File | null;
+  databaseField: ImageDatabaseField;
+};
+
+function readText(
+  formData: FormData,
+  ...keys: string[]
+): string {
+  for (const key of keys) {
+    const value = formData.get(key);
+
+    if (typeof value === "string") {
+      return value.trim();
+    }
   }
 
-  if (!file.type.startsWith("image/")) {
-    throw new Error("File harus berupa gambar.");
-  }
-
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error("Format gambar harus JPG, PNG, atau WebP.");
-  }
-
-  const maxSize = 2 * 1024 * 1024;
-
-  if (file.size > maxSize) {
-    throw new Error("Ukuran gambar maksimal 2MB.");
-  }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const fileName = `lembaga-${randomUUID()}.${ext}`;
-
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "lembaga");
-  await mkdir(uploadDir, { recursive: true });
-
-  const filePath = path.join(uploadDir, fileName);
-  await writeFile(filePath, buffer);
-
-  return `/uploads/lembaga/${fileName}`;
+  return "";
 }
 
-export async function updateIkonLembaga(id: number, formData: FormData) {
+function readLembagaForm(
+  formData: FormData
+): LembagaFormData {
+  const namaLembaga = readText(
+    formData,
+    "namaLembaga",
+    "nama_lembaga"
+  );
+
+  const singkatan = readText(
+    formData,
+    "singkatan"
+  );
+
+  const deskripsi = readText(
+    formData,
+    "deskripsi"
+  );
+
+  const ketua = readText(
+    formData,
+    "ketua"
+  );
+
+  const periode = readText(
+    formData,
+    "periode"
+  );
+
+  const statusValue = readText(
+    formData,
+    "status"
+  );
+
+  const status: StatusLembaga =
+    statusValue === "nonaktif"
+      ? "nonaktif"
+      : "aktif";
+
+  if (!namaLembaga) {
+    throw new Error(
+      "Nama lembaga wajib diisi."
+    );
+  }
+
+  return {
+    namaLembaga,
+    singkatan: singkatan || null,
+    deskripsi: deskripsi || null,
+    ketua: ketua || null,
+    periode: periode || null,
+    status,
+  };
+}
+
+function readLembagaImage(
+  formData: FormData
+): LembagaImageInput {
+  const candidates: Array<{
+    key: string;
+    databaseField: ImageDatabaseField;
+  }> = [
+    {
+      key: "foto",
+      databaseField: "foto",
+    },
+    {
+      key: "gambar",
+      databaseField: "foto",
+    },
+    {
+      key: "ikon",
+      databaseField: "ikon",
+    },
+  ];
+
+  for (const candidate of candidates) {
+    const value = formData.get(candidate.key);
+
+    if (
+      value instanceof File &&
+      value.size > 0
+    ) {
+      return {
+        file: value,
+        databaseField:
+          candidate.databaseField,
+      };
+    }
+  }
+
+  return {
+    file: null,
+    databaseField: "foto",
+  };
+}
+
+function readReturnPath(
+  formData: FormData
+): string {
+  const value = readText(
+    formData,
+    "returnTo",
+    "redirectTo"
+  );
+
+  if (
+    value.startsWith("/") &&
+    !value.startsWith("//")
+  ) {
+    return value;
+  }
+
+  return "/";
+}
+
+function revalidateLembagaPages(): void {
+  revalidatePath("/");
+  revalidatePath("/profil");
+  revalidatePath("/lembaga");
+}
+
+export async function createLembaga(
+  formData: FormData
+): Promise<void> {
   await requireAdmin();
 
-  const file = formData.get("ikon") as File | null;
-  const imageUrl = await saveIkonLembaga(file);
+  const data = readLembagaForm(formData);
+  const imageInput =
+    readLembagaImage(formData);
 
-  await prisma.lembagaDesa.update({
+  const uploadedImage =
+    await uploadImageToStorage(
+      imageInput.file,
+      {
+        folder: "lembaga",
+        filePrefix: "lembaga",
+        maxSizeBytes: MAX_IMAGE_SIZE,
+      }
+    );
+
+  const imageData =
+    uploadedImage
+      ? imageInput.databaseField === "ikon"
+        ? {
+            ikon: uploadedImage.publicUrl,
+          }
+        : {
+            foto: uploadedImage.publicUrl,
+          }
+      : {};
+
+  try {
+    await prisma.lembagaDesa.create({
+      data: {
+        ...data,
+        ...imageData,
+      },
+    });
+  } catch (databaseError) {
+    if (uploadedImage) {
+      await deleteImageFromStorage(
+        uploadedImage.publicUrl
+      );
+    }
+
+    console.error(
+      "Gagal membuat lembaga:",
+      databaseError
+    );
+
+    throw new Error(
+      "Data lembaga gagal disimpan."
+    );
+  }
+
+  const returnPath =
+    readReturnPath(formData);
+
+  revalidateLembagaPages();
+  redirect(returnPath);
+}
+
+export async function updateLembaga(
+  id: number,
+  formData: FormData
+): Promise<void> {
+  await requireAdmin();
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(
+      "ID lembaga tidak valid."
+    );
+  }
+
+  const data = readLembagaForm(formData);
+  const imageInput =
+    readLembagaImage(formData);
+
+  const lembagaLama =
+    await prisma.lembagaDesa.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        foto: true,
+        ikon: true,
+      },
+    });
+
+  if (!lembagaLama) {
+    throw new Error(
+      "Data lembaga tidak ditemukan."
+    );
+  }
+
+  const uploadedImage =
+    await uploadImageToStorage(
+      imageInput.file,
+      {
+        folder: "lembaga",
+        filePrefix: `lembaga-${id}`,
+        maxSizeBytes: MAX_IMAGE_SIZE,
+      }
+    );
+
+  const imageData =
+    uploadedImage
+      ? imageInput.databaseField === "ikon"
+        ? {
+            ikon: uploadedImage.publicUrl,
+          }
+        : {
+            foto: uploadedImage.publicUrl,
+          }
+      : {};
+
+  try {
+    await prisma.lembagaDesa.update({
+      where: {
+        id,
+      },
+      data: {
+        ...data,
+        ...imageData,
+      },
+    });
+  } catch (databaseError) {
+    if (uploadedImage) {
+      await deleteImageFromStorage(
+        uploadedImage.publicUrl
+      );
+    }
+
+    console.error(
+      "Gagal memperbarui lembaga:",
+      databaseError
+    );
+
+    throw new Error(
+      "Data lembaga gagal diperbarui."
+    );
+  }
+
+  if (uploadedImage) {
+    const oldImage =
+      imageInput.databaseField === "ikon"
+        ? lembagaLama.ikon
+        : lembagaLama.foto;
+
+    await deleteImageFromStorage(
+      oldImage
+    );
+  }
+
+  const returnPath =
+    readReturnPath(formData);
+
+  revalidateLembagaPages();
+  redirect(returnPath);
+}
+
+export async function deleteLembaga(
+  id: number
+): Promise<void> {
+  await requireAdmin();
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(
+      "ID lembaga tidak valid."
+    );
+  }
+
+  const lembaga =
+    await prisma.lembagaDesa.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        foto: true,
+        ikon: true,
+      },
+    });
+
+  if (!lembaga) {
+    throw new Error(
+      "Data lembaga tidak ditemukan."
+    );
+  }
+
+  await prisma.lembagaDesa.delete({
     where: {
       id,
     },
-    data: {
-      ikon: imageUrl,
-    },
   });
 
-  revalidatePath("/");
+  await Promise.all([
+    deleteImageFromStorage(lembaga.foto),
+    deleteImageFromStorage(lembaga.ikon),
+  ]);
+
+  revalidateLembagaPages();
 }

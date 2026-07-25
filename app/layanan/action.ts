@@ -1,98 +1,244 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+
+import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import {
+  deleteImageFromStorage,
+  uploadImageToStorage,
+} from "@/lib/supabase-storage";
 
-async function saveLayananImage(file: File | null): Promise<string | null> {
-  if (!file || file.size === 0) return null;
+const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
 
-  if (!file.type.startsWith("image/")) {
-    throw new Error("File harus berupa gambar.");
-  }
+function readLayananForm(
+  formData: FormData
+) {
+  const namaLayanan = String(
+    formData.get("namaLayanan") ?? ""
+  ).trim();
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error("Format gambar harus JPG, PNG, atau WebP.");
-  }
+  const kategori = String(
+    formData.get("kategori") ?? ""
+  ).trim();
 
-  const maxSize = 4 * 1024 * 1024;
-  if (file.size > maxSize) {
-    throw new Error("Ukuran gambar maksimal 4MB.");
-  }
+  const deskripsi = String(
+    formData.get("deskripsi") ?? ""
+  ).trim();
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  const persyaratan = String(
+    formData.get("persyaratan") ?? ""
+  ).trim();
 
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const fileName = `layanan-${randomUUID()}.${ext}`;
+  const tampilanBesar =
+    formData.get("tampilanBesar") === "on" ||
+    formData.get("tampilanBesar") === "true";
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "layanan");
-  await mkdir(uploadDir, { recursive: true });
+  const rawUrutan = Number(
+    formData.get("urutan") ?? 0
+  );
 
-  const filePath = path.join(uploadDir, fileName);
-  await writeFile(filePath, buffer);
-
-  return `/uploads/layanan/${fileName}`;
-}
-
-function readLayananForm(formData: FormData) {
-  const namaLayanan = String(formData.get("namaLayanan") || "").trim();
-  const kategori = String(formData.get("kategori") || "").trim();
-  const deskripsi = String(formData.get("deskripsi") || "").trim() || null;
-  const persyaratan = String(formData.get("persyaratan") || "").trim() || null;
-  const whatsapp = String(formData.get("whatsapp") || "").trim() || null;
-  const tampilanBesar = formData.get("tampilanBesar") === "on";
-  const urutan = Number(formData.get("urutan") || 0);
+  const urutan =
+    Number.isFinite(rawUrutan)
+      ? Math.trunc(rawUrutan)
+      : 0;
 
   if (!namaLayanan || !kategori) {
-    throw new Error("Nama layanan dan kategori wajib diisi.");
+    throw new Error(
+      "Nama layanan dan kategori wajib diisi."
+    );
   }
 
-  return { namaLayanan, kategori, deskripsi, persyaratan, whatsapp, tampilanBesar, urutan };
+  return {
+    namaLayanan,
+    kategori,
+    deskripsi: deskripsi || null,
+    persyaratan: persyaratan || null,
+    tampilanBesar,
+    urutan,
+  };
 }
 
-export async function createLayanan(formData: FormData) {
+function readImageFile(
+  formData: FormData
+): File | null {
+  const value = formData.get("gambar");
+
+  return value instanceof File &&
+    value.size > 0
+    ? value
+    : null;
+}
+
+function revalidateLayananPages(): void {
+  revalidatePath("/");
+  revalidatePath("/layanan");
+}
+
+export async function createLayanan(
+  formData: FormData
+): Promise<void> {
   await requireAdmin();
 
   const data = readLayananForm(formData);
-  const gambarUrl = await saveLayananImage(formData.get("gambar") as File | null);
+  const file = readImageFile(formData);
 
-  await prisma.layananDesa.create({
-    data: { ...data, ikon: gambarUrl, status: "aktif" },
-  });
+  const uploadedImage =
+    await uploadImageToStorage(file, {
+      folder: "layanan",
+      filePrefix: "layanan",
+      maxSizeBytes: MAX_IMAGE_SIZE,
+    });
 
-  revalidatePath("/layanan");
+  try {
+    await prisma.layananDesa.create({
+      data: {
+        ...data,
+        ikon:
+          uploadedImage?.publicUrl ?? null,
+        status: "aktif",
+      },
+    });
+  } catch (databaseError) {
+    if (uploadedImage) {
+      await deleteImageFromStorage(
+        uploadedImage.publicUrl
+      );
+    }
+
+    console.error(
+      "Gagal membuat layanan:",
+      databaseError
+    );
+
+    throw new Error(
+      "Data layanan gagal disimpan."
+    );
+  }
+
+  revalidateLayananPages();
   redirect("/layanan");
 }
 
-export async function updateLayanan(id: number, formData: FormData) {
+export async function updateLayanan(
+  id: number,
+  formData: FormData
+): Promise<void> {
   await requireAdmin();
 
-  const data = readLayananForm(formData);
-  const gambarBaru = await saveLayananImage(formData.get("gambar") as File | null);
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(
+      "ID layanan tidak valid."
+    );
+  }
 
-  await prisma.layananDesa.update({
-    where: { id },
-    data: {
-      ...data,
-      // Kalau admin tidak upload file baru, gambar lama dibiarkan seperti semula.
-      ...(gambarBaru ? { ikon: gambarBaru } : {}),
+  const data = readLayananForm(formData);
+  const file = readImageFile(formData);
+
+  const layananLama =
+    await prisma.layananDesa.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        ikon: true,
+      },
+    });
+
+  if (!layananLama) {
+    throw new Error(
+      "Data layanan tidak ditemukan."
+    );
+  }
+
+  const uploadedImage =
+    await uploadImageToStorage(file, {
+      folder: "layanan",
+      filePrefix: `layanan-${id}`,
+      maxSizeBytes: MAX_IMAGE_SIZE,
+    });
+
+  try {
+    await prisma.layananDesa.update({
+      where: {
+        id,
+      },
+      data: {
+        ...data,
+        ...(uploadedImage
+          ? {
+              ikon:
+                uploadedImage.publicUrl,
+            }
+          : {}),
+      },
+    });
+  } catch (databaseError) {
+    if (uploadedImage) {
+      await deleteImageFromStorage(
+        uploadedImage.publicUrl
+      );
+    }
+
+    console.error(
+      "Gagal memperbarui layanan:",
+      databaseError
+    );
+
+    throw new Error(
+      "Data layanan gagal diperbarui."
+    );
+  }
+
+  if (uploadedImage) {
+    await deleteImageFromStorage(
+      layananLama.ikon
+    );
+  }
+
+  revalidateLayananPages();
+  redirect("/layanan");
+}
+
+export async function deleteLayanan(
+  id: number
+): Promise<void> {
+  await requireAdmin();
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw new Error(
+      "ID layanan tidak valid."
+    );
+  }
+
+  const layanan =
+    await prisma.layananDesa.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        ikon: true,
+      },
+    });
+
+  if (!layanan) {
+    throw new Error(
+      "Data layanan tidak ditemukan."
+    );
+  }
+
+  await prisma.layananDesa.delete({
+    where: {
+      id,
     },
   });
 
-  revalidatePath("/layanan");
-  redirect("/layanan");
-}
+  await deleteImageFromStorage(
+    layanan.ikon
+  );
 
-export async function deleteLayanan(id: number) {
-  await requireAdmin();
-
-  await prisma.layananDesa.delete({ where: { id } });
-
-  revalidatePath("/layanan");
+  revalidateLayananPages();
 }
