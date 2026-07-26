@@ -42,7 +42,7 @@ const DEFAULT_LEMBAGA: LembagaItem[] = [
   {
     id: 3,
     singkatan: "PKK",
-    nama: "Pemberdayaan dan Kesejahteraan Keluarga",
+    nama: "Pemberdayaan Kesejahteraan Keluarga",
     deskripsiSingkat: "Pemberdayaan Kesejahteraan Keluarga",
     detail:
       "Pemberdayaan dan Kesejahteraan Keluarga (PKK) adalah organisasi kemasyarakatan yang bertujuan meningkatkan kesejahteraan keluarga. Kegiatan PKK meliputi bidang kesehatan, pendidikan, keterampilan, lingkungan hidup, serta pembinaan keluarga.",
@@ -99,8 +99,8 @@ export function KelembagaanSection({
     null
   );
 
-  const lembagaList = DEFAULT_LEMBAGA.map((defaultItem) => {
-    const databaseItem = matchLembaga(defaultItem, data);
+  const lembagaList = DEFAULT_LEMBAGA.map((defaultItem, index) => {
+    const databaseItem = matchLembaga(defaultItem, data) || data?.[index];
 
     return {
       ...defaultItem,
@@ -118,10 +118,12 @@ export function KelembagaanSection({
           <div className="h-20 w-1.5 rounded-full bg-blue-600" />
 
           <div>
-            <p className="text-xl font-extrabold uppercase text-blue-600">
+            <p className="text-xl font-extrabold uppercase leading-tight text-blue-600">
               Lembaga
             </p>
-            <h2 className="text-4xl font-black text-slate-950">Desa</h2>
+            <h2 className="text-4xl font-black leading-tight text-slate-950">
+              Desa
+            </h2>
           </div>
         </div>
 
@@ -144,7 +146,7 @@ export function KelembagaanSection({
       </div>
 
       {selectedLembaga && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4">
           <div className="relative w-full max-w-2xl rounded-3xl bg-white p-8 shadow-2xl">
             <button
               type="button"
@@ -214,9 +216,8 @@ function LembagaCard({
   const canUpload = isAdmin && Boolean(item.databaseId);
 
   function handleIconClick() {
-    if (canUpload) {
-      inputRef.current?.click();
-    }
+    if (!canUpload) return;
+    inputRef.current?.click();
   }
 
   function handleFileChange() {
@@ -246,7 +247,9 @@ function LembagaCard({
         onClick={handleIconClick}
         disabled={!canUpload}
         className={`relative mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-blue-100 text-blue-700 ${
-          canUpload ? "cursor-pointer ring-2 ring-blue-300" : "cursor-default"
+          canUpload
+            ? "cursor-pointer ring-2 ring-blue-400 ring-offset-2"
+            : "cursor-default"
         }`}
         title={
           canUpload
@@ -265,15 +268,15 @@ function LembagaCard({
         )}
 
         {canUpload && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/35 opacity-0 transition hover:opacity-100">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition hover:opacity-100">
             <Camera size={28} className="text-white" />
           </div>
         )}
       </button>
 
-      {!item.databaseId && isAdmin && (
+      {isAdmin && !item.databaseId && (
         <p className="mt-3 text-xs font-semibold text-red-600">
-
+          Data belum terhubung ke database.
         </p>
       )}
 

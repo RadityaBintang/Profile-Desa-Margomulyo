@@ -16,7 +16,10 @@ import { getAdminSession } from "@/lib/auth";
 
 export default async function HomePage() {
   const session = await getAdminSession();
-  const isAdmin = session?.role === "admin";
+
+  // Jangan pakai session?.role dulu.
+  // Jika session ada, berarti admin sudah login.
+  const isAdmin = Boolean(session);
 
   const [profil, video, jamPelayanan, kegiatan, lembaga, produkHukum] =
     await Promise.all([
@@ -32,7 +35,7 @@ export default async function HomePage() {
     <main>
       <HeroVideo videoUrl={video?.urlVideo} />
       <JamPelayanan data={jamPelayanan} />
-<ProfilSingkat profil={profil} isAdmin={isAdmin} />
+      <ProfilSingkat profil={profil} isAdmin={isAdmin} />
       <KegiatanSection data={kegiatan} />
       <KelembagaanSection data={lembaga} isAdmin={isAdmin} />
       <ProdukHukumSection data={produkHukum} />
