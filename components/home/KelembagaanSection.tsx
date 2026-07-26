@@ -273,7 +273,7 @@ function LembagaCard({
 
       {!item.databaseId && isAdmin && (
         <p className="mt-3 text-xs font-semibold text-red-600">
-          Data lembaga belum terhubung ke database.
+
         </p>
       )}
 
