@@ -1,69 +1,135 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import {
+  ArrowLeft,
+  CalendarDays,
+  FileText,
+  ImageIcon,
+  MapPin,
+  Save,
+  Tag,
+} from "lucide-react";
+import {
+  notFound,
+  redirect,
+} from "next/navigation";
+
 import { prisma } from "@/lib/prisma";
-import { updatePublicKegiatan } from "../../actions";
 import { getAdminSession } from "@/lib/auth";
+import { updatePublicKegiatan } from "../../actions";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+type EditKegiatanPageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
+
+function formatTanggalInput(date: Date): string {
+  const tanggal = new Date(date);
+
+  const tahun = tanggal.getFullYear();
+  const bulan = String(
+    tanggal.getMonth() + 1
+  ).padStart(2, "0");
+  const hari = String(
+    tanggal.getDate()
+  ).padStart(2, "0");
+
+  return `${tahun}-${bulan}-${hari}`;
+}
 
 export default async function EditKegiatanPage({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+}: EditKegiatanPageProps) {
   const { slug } = await params;
 
   const session = await getAdminSession();
 
   if (!session) {
-    redirect(`/login?redirectTo=/kegiatan/${slug}/edit`);
+    const redirectTo =
+      `/kegiatan/${encodeURIComponent(slug)}/edit`;
+
+    redirect(
+      `/login?redirectTo=${encodeURIComponent(
+        redirectTo
+      )}`
+    );
   }
 
   const numericId = Number(slug);
 
-  const kegiatan = await prisma.kegiatan.findFirst({
-    where: {
-      OR: [
-        {
-          slug: slug,
-        },
-        ...(Number.isNaN(numericId)
-          ? []
-          : [
-              {
-                id: numericId,
-              },
-            ]),
-      ],
-    },
-  });
+  const isNumericId =
+    Number.isInteger(numericId) &&
+    numericId > 0;
+
+  const kegiatan =
+    await prisma.kegiatan.findFirst({
+      where: {
+        OR: [
+          {
+            slug,
+          },
+          ...(isNumericId
+            ? [
+                {
+                  id: numericId,
+                },
+              ]
+            : []),
+        ],
+      },
+    });
 
   if (!kegiatan) {
     notFound();
   }
 
-  const updateKegiatanById = updatePublicKegiatan.bind(null, kegiatan.id);
+  const updateKegiatanById =
+    updatePublicKegiatan.bind(
+      null,
+      kegiatan.id
+    );
 
-  const tanggalValue = new Date(kegiatan.tanggal).toISOString().split("T")[0];
+  const tanggalValue =
+    formatTanggalInput(kegiatan.tanggal);
 
   return (
     <main className="activity-form-page">
       <div className="container-desa">
         <div className="activity-form-header">
           <div>
-            <p className="activity-form-label">FORM KEGIATAN</p>
-            <h1 className="activity-form-title">Edit Kegiatan Desa</h1>
+            <p className="activity-form-label">
+              Form Kegiatan
+            </p>
+
+            <h1 className="activity-form-title">
+              Edit Kegiatan Desa
+            </h1>
+
             <p className="activity-form-description">
-              Perbarui informasi kegiatan desa. Data yang diubah akan otomatis
-              tampil pada halaman kegiatan dan beranda website.
+              Perbarui informasi kegiatan desa.
+              Data yang disimpan akan otomatis
+              ditampilkan pada halaman kegiatan
+              dan beranda website.
             </p>
           </div>
 
-          <Link href="/kegiatan" className="activity-back-button">
-            Kembali
+          <Link
+            href="/kegiatan"
+            className="activity-back-button"
+          >
+            <ArrowLeft size={17} />
+            <span>Kembali</span>
           </Link>
         </div>
 
         <div className="activity-form-card">
-          <form action={updateKegiatanById} encType="multipart/form-data" className="activity-form">
+          <form
+            action={updateKegiatanById}
+            className="activity-form"
+          >
             <input
               type="hidden"
               name="gambar_lama"
@@ -71,19 +137,28 @@ export default async function EditKegiatanPage({
             />
 
             <div className="activity-input-group">
-              <label htmlFor="judul">Judul Kegiatan</label>
+              <label htmlFor="judul">
+                <FileText size={16} />
+                <span>Judul Kegiatan</span>
+              </label>
+
               <input
                 id="judul"
                 name="judul"
                 type="text"
                 defaultValue={kegiatan.judul}
+                placeholder="Masukkan judul kegiatan"
                 required
               />
             </div>
 
             <div className="activity-form-grid">
               <div className="activity-input-group">
-                <label htmlFor="tanggal">Tanggal Kegiatan</label>
+                <label htmlFor="tanggal">
+                  <CalendarDays size={16} />
+                  <span>Tanggal Kegiatan</span>
+                </label>
+
                 <input
                   id="tanggal"
                   name="tanggal"
@@ -94,29 +169,45 @@ export default async function EditKegiatanPage({
               </div>
 
               <div className="activity-input-group">
-                <label htmlFor="kategori">Kategori</label>
+                <label htmlFor="kategori">
+                  <Tag size={16} />
+                  <span>Kategori</span>
+                </label>
+
                 <input
                   id="kategori"
                   name="kategori"
                   type="text"
-                  defaultValue={kegiatan.kategori || ""}
-                  placeholder="Sosial, Pemerintahan, Pemuda"
+                  defaultValue={
+                    kegiatan.kategori || ""
+                  }
+                  placeholder="Contoh: Sosial atau Pertanian"
                 />
               </div>
             </div>
 
             <div className="activity-input-group">
-              <label htmlFor="lokasi">Lokasi Kegiatan</label>
+              <label htmlFor="lokasi">
+                <MapPin size={16} />
+                <span>Lokasi Kegiatan</span>
+              </label>
+
               <input
                 id="lokasi"
                 name="lokasi"
                 type="text"
-                defaultValue={kegiatan.lokasi || ""}
+                defaultValue={
+                  kegiatan.lokasi || ""
+                }
+                placeholder="Contoh: Balai Desa Margomulyo"
               />
             </div>
 
             <div className="activity-input-group">
-              <label>Foto Kegiatan Saat Ini</label>
+              <label>
+                <ImageIcon size={16} />
+                <span>Foto Kegiatan Saat Ini</span>
+              </label>
 
               {kegiatan.gambar ? (
                 <div className="activity-current-image-box">
@@ -130,56 +221,93 @@ export default async function EditKegiatanPage({
                     <p className="activity-current-image-title">
                       Gambar sedang digunakan
                     </p>
+
                     <p className="activity-current-image-path">
-                      {kegiatan.gambar}
+                      Unggah gambar baru hanya
+                      apabila foto kegiatan ingin
+                      diganti.
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="activity-empty-image">
-                  Belum ada gambar untuk kegiatan ini.
+                  Belum ada gambar untuk kegiatan
+                  ini.
                 </div>
               )}
             </div>
 
             <div className="activity-input-group">
-              <label htmlFor="gambar">Ganti Foto Kegiatan</label>
+              <label htmlFor="gambar">
+                <ImageIcon size={16} />
+                <span>Ganti Foto Kegiatan</span>
+              </label>
+
               <div className="activity-upload-box">
-                <input id="gambar" name="gambar" type="file" accept="image/*" />
+                <input
+                  id="gambar"
+                  name="gambar"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                />
+
                 <small>
-                  Kosongkan jika tidak ingin mengganti gambar. Format JPG, PNG,
-                  atau WebP. Maksimal 5MB.
+                  Kosongkan jika tidak ingin
+                  mengganti gambar. Format JPG,
+                  PNG, atau WebP. Ukuran maksimal
+                  5 MB.
                 </small>
               </div>
             </div>
 
             <div className="activity-input-group">
-              <label htmlFor="ringkasan">Ringkasan</label>
+              <label htmlFor="ringkasan">
+                <FileText size={16} />
+                <span>Ringkasan</span>
+              </label>
+
               <textarea
                 id="ringkasan"
                 name="ringkasan"
                 rows={4}
-                defaultValue={kegiatan.ringkasan || ""}
-              ></textarea>
+                defaultValue={
+                  kegiatan.ringkasan || ""
+                }
+                placeholder="Masukkan ringkasan singkat kegiatan"
+              />
             </div>
 
             <div className="activity-input-group">
-              <label htmlFor="isi">Isi Lengkap</label>
+              <label htmlFor="isi">
+                <FileText size={16} />
+                <span>Isi Lengkap</span>
+              </label>
+
               <textarea
                 id="isi"
                 name="isi"
                 rows={8}
-                defaultValue={kegiatan.isi || ""}
-              ></textarea>
+                defaultValue={
+                  kegiatan.isi || ""
+                }
+                placeholder="Masukkan isi lengkap kegiatan"
+              />
             </div>
 
             <div className="activity-form-actions">
-              <Link href="/kegiatan" className="activity-cancel-button">
+              <Link
+                href="/kegiatan"
+                className="activity-cancel-button"
+              >
                 Batal
               </Link>
 
-              <button type="submit" className="activity-submit-button">
-                Update Kegiatan
+              <button
+                type="submit"
+                className="activity-submit-button"
+              >
+                <Save size={17} />
+                <span>Update Kegiatan</span>
               </button>
             </div>
           </form>
