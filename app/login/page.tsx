@@ -4,6 +4,10 @@ import { LoginForm } from "./LoginForm";
 
 export const metadata = {
   title: "Login Admin - Website Profil Desa",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function LoginPage({
