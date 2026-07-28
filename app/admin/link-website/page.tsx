@@ -7,7 +7,7 @@ const externalLinks = [
   {
     title: "Website Perpustakaan Margomulyo",
     description: "Website Administrasi Perpustakaan Desa Margomulyo.",
-    url: "https://script.google.com/macros/s/AKfycbyDi3sT-oqFu0khcIBPt-7PDwPu_2MACeMXVUbMlcrjwMJOut91nmIYgDjcpDoj9-JB/exec",
+    url: "https://script.google.com/macros/s/AKfycbyPOZn_8aJpHlWeBQd3lkT8IJBFc2WyMV28LIevyCGaJw0zstw5EkNqYWbAwSSGEGtP/exec",
   },
   
 ];
