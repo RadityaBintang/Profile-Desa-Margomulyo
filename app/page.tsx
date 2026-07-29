@@ -17,8 +17,8 @@ import { getAdminSession } from "@/lib/auth";
 export default async function HomePage() {
   const session = await getAdminSession();
 
-  // Jangan pakai session?.role dulu.
-  // Jika session ada, berarti admin sudah login.
+  // Jangan pakai session?.role === "admin"
+  // karena session kamu kemungkinan tidak punya role.
   const isAdmin = Boolean(session);
 
   const [profil, video, jamPelayanan, kegiatan, lembaga, produkHukum] =
@@ -34,11 +34,17 @@ export default async function HomePage() {
   return (
     <main>
       <HeroVideo videoUrl={video?.urlVideo} />
-     <JamPelayanan data={jamPelayanan} isAdmin={isAdmin} />
+
+      <JamPelayanan data={jamPelayanan} isAdmin={isAdmin} />
+
       <ProfilSingkat profil={profil} isAdmin={isAdmin} />
+
       <KegiatanSection data={kegiatan} />
+
       <KelembagaanSection data={lembaga} isAdmin={isAdmin} />
+
       <ProdukHukumSection data={produkHukum} />
+
       <KontakLokasi profil={profil} />
     </main>
   );
