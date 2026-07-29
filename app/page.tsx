@@ -34,7 +34,7 @@ export default async function HomePage() {
   return (
     <main>
       <HeroVideo videoUrl={video?.urlVideo} />
-      <JamPelayanan data={jamPelayanan} />
+     <JamPelayanan data={jamPelayanan} isAdmin={isAdmin} />
       <ProfilSingkat profil={profil} isAdmin={isAdmin} />
       <KegiatanSection data={kegiatan} />
       <KelembagaanSection data={lembaga} isAdmin={isAdmin} />
