@@ -14,11 +14,11 @@ import { getLembagaAktif } from "@/lib/queries/lembaga";
 import { getProdukHukumTerbaru } from "@/lib/queries/produk-hukum";
 import { getAdminSession } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const session = await getAdminSession();
-
-  // Jangan pakai session?.role === "admin"
-  // karena session kamu kemungkinan tidak punya role.
   const isAdmin = Boolean(session);
 
   const [profil, video, jamPelayanan, kegiatan, lembaga, produkHukum] =
