@@ -1,5 +1,6 @@
-import { Building2, Clock, Save } from "lucide-react";
+import { getAdminSession } from "@/lib/auth";
 import { updateJamPelayanan } from "@/app/actions/jam-pelayanan";
+import { Building2, Clock, Save } from "lucide-react";
 
 type JamPelayananItem = {
   id?: number;
@@ -22,15 +23,15 @@ type JamDisplayItem = {
 const DEFAULT_JAM: JamDisplayItem[] = [
   {
     hari: "Senin - Kamis",
-    jamBuka: new Date("1970-01-01T08:00:00.000Z"),
-    jamTutup: new Date("1970-01-01T15:30:00.000Z"),
+    jamBuka: "08:00",
+    jamTutup: "15:30",
     keterangan: null,
     urutan: 1,
   },
   {
     hari: "Jumat",
-    jamBuka: new Date("1970-01-01T08:00:00.000Z"),
-    jamTutup: new Date("1970-01-01T15:30:00.000Z"),
+    jamBuka: "08:00",
+    jamTutup: "15:30",
     keterangan: null,
     urutan: 2,
   },
@@ -90,13 +91,16 @@ function formatJamLabel(item: JamDisplayItem) {
   return `${buka.replace(":", ".")}–${tutup.replace(":", ".")} WIB`;
 }
 
-export function JamPelayanan({
+export async function JamPelayanan({
   data,
-  isAdmin = false,
+  isAdmin: isAdminFromPage = false,
 }: {
   data?: JamPelayananItem[];
   isAdmin?: boolean;
 }) {
+  const session = await getAdminSession();
+  const isAdmin = isAdminFromPage || Boolean(session);
+
   const jamList = DEFAULT_JAM.map((defaultItem) => {
     const databaseItem = matchJam(defaultItem, data);
 
@@ -149,76 +153,95 @@ export function JamPelayanan({
                 <p className="mt-3 text-2xl font-medium tracking-tight text-slate-900">
                   {formatJamLabel(item)}
                 </p>
-
-                {isAdmin && (
-                  <form
-                    action={updateJamPelayanan}
-                    className="mt-5 w-full rounded-2xl border border-blue-100 bg-blue-50 p-4 text-left"
-                  >
-                    <input type="hidden" name="id" value={item.id || ""} />
-                    <input type="hidden" name="hari" value={item.hari} />
-                    <input type="hidden" name="urutan" value={item.urutan} />
-
-                    <div className="grid gap-3">
-                      <div>
-                        <label className="text-xs font-bold text-slate-700">
-                          Jam Buka
-                        </label>
-                        <input
-                          type="time"
-                          name="jamBuka"
-                          defaultValue={formatTimeInput(item.jamBuka)}
-                          className="mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-bold text-slate-700">
-                          Jam Tutup
-                        </label>
-                        <input
-                          type="time"
-                          name="jamTutup"
-                          defaultValue={formatTimeInput(item.jamTutup)}
-                          className="mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-bold text-slate-700">
-                          Keterangan
-                        </label>
-                        <input
-                          type="text"
-                          name="keterangan"
-                          defaultValue={item.keterangan || ""}
-                          placeholder="Contoh: Tutup"
-                          className="mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
-                        />
-                        <p className="mt-1 text-[11px] text-slate-500">
-                          Isi “Tutup” jika layanan tidak buka.
-                        </p>
-                      </div>
-
-                      <button
-                        type="submit"
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-800"
-                      >
-                        <Save size={14} />
-                        Simpan
-                      </button>
-                    </div>
-                  </form>
-                )}
               </div>
             ))}
           </div>
         </div>
 
         {isAdmin && (
-          <p className="mt-3 text-center text-xs font-semibold text-blue-700">
-            Mode admin aktif. Jam operasional dapat diedit langsung dari beranda.
-          </p>
+          <div className="mt-6 rounded-3xl border border-blue-100 bg-blue-50 p-6 shadow-sm">
+            <div className="mb-5 text-center">
+              <p className="text-sm font-extrabold uppercase text-blue-600">
+                Mode Admin Aktif
+              </p>
+              <h3 className="mt-1 text-2xl font-black text-slate-950">
+                Edit Jam Operasional
+              </h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Ubah jam buka, jam tutup, atau keterangan pelayanan desa
+                langsung dari beranda.
+              </p>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-3">
+              {jamList.map((item) => (
+                <form
+                  key={`edit-${item.hari}`}
+                  action={updateJamPelayanan}
+                  className="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm"
+                >
+                  <input type="hidden" name="id" value={item.id || ""} />
+                  <input type="hidden" name="hari" value={item.hari} />
+                  <input type="hidden" name="urutan" value={item.urutan} />
+
+                  <h4 className="mb-4 text-center text-lg font-black text-blue-900">
+                    {item.hari}
+                  </h4>
+
+                  <div className="grid gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700">
+                        Jam Buka
+                      </label>
+                      <input
+                        type="time"
+                        name="jamBuka"
+                        defaultValue={formatTimeInput(item.jamBuka)}
+                        className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700">
+                        Jam Tutup
+                      </label>
+                      <input
+                        type="time"
+                        name="jamTutup"
+                        defaultValue={formatTimeInput(item.jamTutup)}
+                        className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700">
+                        Keterangan
+                      </label>
+                      <input
+                        type="text"
+                        name="keterangan"
+                        defaultValue={item.keterangan || ""}
+                        placeholder="Contoh: Tutup"
+                        className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      />
+                      <p className="mt-1 text-[11px] text-slate-500">
+                        Isi “Tutup” jika layanan tidak buka. Kosongkan jika
+                        menggunakan jam buka dan tutup.
+                      </p>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-blue-800"
+                    >
+                      <Save size={14} />
+                      Simpan Perubahan
+                    </button>
+                  </div>
+                </form>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </section>
