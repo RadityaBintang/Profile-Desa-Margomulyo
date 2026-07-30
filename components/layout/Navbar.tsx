@@ -4,8 +4,6 @@ import {
   ChevronDown,
   LogIn,
   LogOut,
-  MapPin,
-  Phone,
   ShieldCheck,
 } from "lucide-react";
 import { getAdminSession } from "@/lib/auth";
@@ -24,6 +22,10 @@ export async function Navbar() {
       href: "/profil/struktur-organisasi",
     },
     {
+      label: "Lembaga Desa",
+      href: "/profil/lembaga-desa",
+    },
+    {
       label: "Perangkat Desa",
       href: "/profil/perangkat-desa",
     },
@@ -35,24 +37,6 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="bg-blue-900 text-white">
-        <div className="container-desa flex items-center justify-between py-3 text-sm">
-          <div className="flex flex-wrap items-center gap-5">
-            <span className="flex items-center gap-2">
-              <MapPin size={16} />
-              Jl. Protokol No.27, Rampal Lombo
-            </span>
-
-            <span className="flex items-center gap-2">
-              <Phone size={16} />
-              (+62) 816-1545-3303
-            </span>
-          </div>
-
-          <p className="hidden font-semibold md:block">Website Resmi Desa</p>
-        </div>
-      </div>
-
       <nav className="bg-white">
         <div className="container-desa flex items-center justify-between py-5">
           <Link href="/" className="flex items-center gap-4">
@@ -72,7 +56,7 @@ export async function Navbar() {
             </div>
           </Link>
 
-          <div className="hidden items-center gap-7 lg:flex">
+          <div className="hidden items-center gap-8 lg:flex">
             {session && (
               <Link
                 href="/admin/link-website"
@@ -111,13 +95,6 @@ export async function Navbar() {
                 ))}
               </div>
             </details>
-
-            <Link
-              href="/profil/lembaga-desa"
-              className="text-sm font-bold text-blue-700 transition hover:text-blue-900"
-            >
-              Lembaga Desa
-            </Link>
 
             <Link
               href="/kegiatan"
