@@ -24,10 +24,6 @@ export async function Navbar() {
       href: "/profil/struktur-organisasi",
     },
     {
-      label: "Lembaga Desa",
-      href: "/profil/lembaga-desa",
-    },
-    {
       label: "Perangkat Desa",
       href: "/profil/perangkat-desa",
     },
@@ -76,7 +72,7 @@ export async function Navbar() {
             </div>
           </Link>
 
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="hidden items-center gap-7 lg:flex">
             {session && (
               <Link
                 href="/admin/link-website"
@@ -115,6 +111,13 @@ export async function Navbar() {
                 ))}
               </div>
             </details>
+
+            <Link
+              href="/profil/lembaga-desa"
+              className="text-sm font-bold text-blue-700 transition hover:text-blue-900"
+            >
+              Lembaga Desa
+            </Link>
 
             <Link
               href="/kegiatan"
