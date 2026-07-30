@@ -53,7 +53,7 @@ export function ProfilDesaDropdown() {
             className="fixed inset-0 z-40 cursor-default bg-transparent"
           />
 
-          <div className="absolute left-0 top-full z-50 mt-3 w-60 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl">
+          <div className="absolute left-0 top-full z-[999] mt-3 w-72 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl">
             {profilMenus.map((menu) => (
               <Link
                 key={menu.href}

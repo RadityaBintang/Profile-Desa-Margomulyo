@@ -1,95 +1,125 @@
 import Link from "next/link";
-import { BookOpen, LogIn, LogOut, ShieldCheck } from "lucide-react";
+import {
+  BookOpen,
+  LogIn,
+  LogOut,
+  MapPin,
+  Phone,
+  ShieldCheck,
+} from "lucide-react";
 import { getAdminSession } from "@/lib/auth";
 import { logoutAdmin } from "@/app/actions/auth";
 import { ProfilDesaDropdown } from "./ProfilDesaDropdown";
-
-const menus = [
-  { label: "Beranda", href: "/" },
-  { label: "Kegiatan", href: "/kegiatan" },
-  { label: "Produk Hukum", href: "/produk-hukum" },
-  { label: "Kontak", href: "/kontak" },
-];
 
 export async function Navbar() {
   const session = await getAdminSession();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <nav className="container-desa flex items-center justify-between py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <img
-            src="/images/logo-margomulyo.png"
-            alt="Logo Desa Margomulyo"
-            className="h-12 w-12 rounded-full object-contain"
-          />
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
+      <div className="bg-blue-900 text-white">
+        <div className="container-desa flex items-center justify-between py-3 text-sm">
+          <div className="flex flex-wrap items-center gap-5">
+            <span className="flex items-center gap-2">
+              <MapPin size={16} />
+              Jl. Protokol No.27, Rampal Lombo
+            </span>
 
-          <div>
-            <p className="font-bold text-slate-900">DESA MARGOMULYO</p>
-            <p className="text-xs text-slate-500">
-              Kecamatan Panggungrejo, Kabupaten Blitar
-            </p>
+            <span className="flex items-center gap-2">
+              <Phone size={16} />
+              (+62) 816-1545-3303
+            </span>
           </div>
-        </Link>
 
-        <div className="flex items-center gap-4">
-         <div className="hidden items-center gap-6 text-sm font-medium text-slate-700 lg:flex">
-  {session && (
-    <Link
-      href="/admin/link-website"
-      className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100 transition hover:bg-blue-100"
-      title="Link Website Admin"
-    >
-      <BookOpen size={18} />
-    </Link>
-  )}
+          <p className="hidden font-semibold md:block">Website Resmi Desa</p>
+        </div>
+      </div>
 
-  <Link href={menus[0].href} className="transition hover:text-blue-600">
-    {menus[0].label}
-  </Link>
+      <nav className="bg-white">
+        <div className="container-desa flex items-center justify-between py-5">
+          <Link href="/" className="flex items-center gap-4">
+            <img
+              src="/images/logo-margomulyo.png"
+              alt="Logo Desa Margomulyo"
+              className="h-14 w-14 rounded-full object-contain"
+            />
 
-  <ProfilDesaDropdown />
+            <div>
+              <h1 className="text-lg font-black leading-tight text-slate-900">
+                DESA MARGOMULYO
+              </h1>
+              <p className="text-sm font-medium text-slate-500">
+                Kecamatan Panggungrejo, Kabupaten Blitar
+              </p>
+            </div>
+          </Link>
 
-            {menus.slice(1).map((menu) => (
+          <div className="hidden items-center gap-8 lg:flex">
+            {session && (
               <Link
-                key={menu.href}
-                href={menu.href}
-                className="transition hover:text-blue-600"
+                href="/admin/link-website"
+                title="Link Website Admin"
+                className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 ring-1 ring-blue-100 transition hover:bg-blue-100"
               >
-                {menu.label}
+                <BookOpen size={20} />
               </Link>
-            ))}
-          </div>
+            )}
 
-          <div className="navbar-admin-area">
+            <Link
+              href="/"
+              className="text-sm font-medium text-slate-700 transition hover:text-blue-600"
+            >
+              Beranda
+            </Link>
+
+            <ProfilDesaDropdown />
+
+            <Link
+              href="/kegiatan"
+              className="text-sm font-medium text-slate-700 transition hover:text-blue-600"
+            >
+              Kegiatan
+            </Link>
+
+            <Link
+              href="/produk-hukum"
+              className="text-sm font-medium text-slate-700 transition hover:text-blue-600"
+            >
+              Produk Hukum
+            </Link>
+
+            <Link
+              href="/kontak"
+              className="text-sm font-medium text-slate-700 transition hover:text-blue-600"
+            >
+              Kontak
+            </Link>
+
+            <div className="h-8 w-px bg-slate-200" />
+
             {session ? (
-              <>
-                <span className="navbar-admin-name">
-                  <ShieldCheck size={15} />
-                  <span className="navbar-login-text">
-                    {session.nama || session.username}
-                  </span>
-                </span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 text-sm font-bold text-blue-700">
+                  <ShieldCheck size={18} />
+                  Administrator
+                </div>
 
                 <form action={logoutAdmin}>
                   <button
                     type="submit"
-                    className="navbar-login-button"
-                    title="Keluar"
+                    className="inline-flex items-center gap-2 rounded-full border border-blue-200 px-5 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-50"
                   >
                     <LogOut size={16} />
-                    <span className="navbar-login-text">Keluar</span>
+                    Keluar
                   </button>
                 </form>
-              </>
+              </div>
             ) : (
               <Link
                 href="/login"
-                className="navbar-login-button"
-                title="Login Admin"
+                className="inline-flex items-center gap-2 rounded-full bg-blue-700 px-5 py-2 text-sm font-bold text-white transition hover:bg-blue-800"
               >
                 <LogIn size={16} />
-                <span className="navbar-login-text">Login</span>
+                Login
               </Link>
             )}
           </div>
