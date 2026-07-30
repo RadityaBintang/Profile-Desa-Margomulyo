@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BookOpen,
+  ChevronDown,
   LogIn,
   LogOut,
   MapPin,
@@ -9,10 +10,32 @@ import {
 } from "lucide-react";
 import { getAdminSession } from "@/lib/auth";
 import { logoutAdmin } from "@/app/actions/auth";
-import { ProfilDesaDropdown } from "./ProfilDesaDropdown";
 
 export async function Navbar() {
   const session = await getAdminSession();
+
+  const profilMenus = [
+    {
+      label: "Visi & Misi",
+      href: "/profil/visi-misi",
+    },
+    {
+      label: "Struktur Organisasi",
+      href: "/profil/struktur-organisasi",
+    },
+    {
+      label: "Lembaga Desa",
+      href: "/profil/lembaga-desa",
+    },
+    {
+      label: "Perangkat Desa",
+      href: "/profil/perangkat-desa",
+    },
+    {
+      label: "Layanan Publik",
+      href: "/layanan",
+    },
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -71,7 +94,27 @@ export async function Navbar() {
               Beranda
             </Link>
 
-            <ProfilDesaDropdown />
+            <details className="group relative">
+              <summary className="flex cursor-pointer list-none items-center gap-1 text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                Profil Desa
+                <ChevronDown
+                  size={14}
+                  className="transition-transform group-open:rotate-180"
+                />
+              </summary>
+
+              <div className="absolute left-0 top-full z-[999] mt-3 w-72 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl">
+                {profilMenus.map((menu) => (
+                  <Link
+                    key={menu.href}
+                    href={menu.href}
+                    className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+                  >
+                    {menu.label}
+                  </Link>
+                ))}
+              </div>
+            </details>
 
             <Link
               href="/kegiatan"
