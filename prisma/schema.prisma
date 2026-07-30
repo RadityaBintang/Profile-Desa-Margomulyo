@@ -37,9 +37,10 @@ model ProfilDesa {
   fotoKantor         String?  @map("foto_kantor") @db.VarChar(255)
   mapsEmbed          String?  @map("maps_embed")
   strukturOrganisasi String?  @map("struktur_organisasi") @db.VarChar(255)
+  gambarLembagaDesa  String?  @map("gambar_lembaga_desa") @db.VarChar(255)
   createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-
+   
   @@map("profil_desa")
 }
 

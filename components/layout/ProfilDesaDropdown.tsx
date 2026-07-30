@@ -14,6 +14,10 @@ const profilMenus = [
     href: "/profil/struktur-organisasi",
   },
   {
+    label: "Lembaga Desa",
+    href: "/profil/lembaga-desa",
+  },
+  {
     label: "Perangkat Desa",
     href: "/profil/perangkat-desa",
   },
