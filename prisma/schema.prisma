@@ -97,6 +97,7 @@ model LembagaDesa {
   ikon        String?          @db.VarChar(255)
   foto        String?          @db.VarChar(255)
   status      StatusAktif?     @default(aktif)
+  gambarKepengurusan String? @map("gambar_kepengurusan") @db.VarChar(255)
   createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   anggota     AnggotaLembaga[]
